@@ -1,5 +1,6 @@
 import { getDatesFromTimeSeriesObject } from './utils.js'
 import { createMap, populateMap } from './map.js'
+import { populateLineGraph } from "./line-graph.js";
 
 const mapboxAccessToken = 'pk.eyJ1IjoibWF0dGRyYWdvOTgiLCJhIjoiY2s4MWhia2l0MDUyZTNmb2Rqa2x1YjV0NiJ9.XmI1DncVRdyUOl_yhifSJQ'
 
