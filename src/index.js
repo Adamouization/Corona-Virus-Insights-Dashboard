@@ -1,6 +1,6 @@
 import { getDatesFromTimeSeriesObject } from './utils.js'
 import { createMap, populateMap } from './map.js'
-import { populateLineGraph } from "./line-graph.js";
+import { populateLineGraph } from './line-graph.js'
 
 const mapboxAccessToken = 'pk.eyJ1IjoibWF0dGRyYWdvOTgiLCJhIjoiY2s4MWhia2l0MDUyZTNmb2Rqa2x1YjV0NiJ9.XmI1DncVRdyUOl_yhifSJQ'
 
@@ -21,8 +21,8 @@ const update = () => {
 
 d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
   .then(async cases => {
-    const dates = Object.keys(getDatesFromTimeSeriesObject(cases[0])).sort((a, b) => new Date(b) - new Date(a))
-    populateMap('#map', map, cases, dates[0])
+    const dates = Object.keys(getDatesFromTimeSeriesObject(cases[0]))
+    populateMap('#map', map, cases, dates.sort((a, b) => new Date(b) - new Date(a))[0])
   })
 
 map.on('moveend', update)
