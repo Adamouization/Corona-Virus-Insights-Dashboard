@@ -23,9 +23,9 @@ const createMap = mapboxAccessToken => {
  * A function to populate the map.
  * @param {*} style the styling function
  */
-const populateMap = async (map, mapInstance, cases) => {
+const populateMap = async (map, mapInstance, cases, date) => {
   const geoData = await d3.csv('./data/countries.csv')
-  const mapFeatures = geoData.map(item => ({ ...item, cases: collapseByDate(getByCountry(item.name, cases), '3/27/20') }))
+  const mapFeatures = geoData.map(item => ({ ...item, cases: collapseByDate(getByCountry(item.name, cases), date) }))
   const size = d3.scaleSqrt()
     .domain([Math.min(...mapFeatures.map(item => item.cases)), Math.max(...mapFeatures.map(item => item.cases))])
     .range([0, 50])

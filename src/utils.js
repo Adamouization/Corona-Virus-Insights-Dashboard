@@ -1,4 +1,4 @@
-const isDate = function (date) {
+const isDate = date => {
   return (new Date(date) !== 'Invalid Date') && !isNaN(new Date(date))
 }
 
