@@ -1,6 +1,8 @@
 import {getCasesOnDay} from "./utils.js"
 
 const populateLineGraph = async (lineGraphDom, cases, dates) => {
+  let margin = 50
+
   // Reverse dates to have them in chronological order, and get the first and last date.
   dates.reverse()
   let dateExtent = d3.extent(dates)
@@ -22,8 +24,14 @@ const populateLineGraph = async (lineGraphDom, cases, dates) => {
     .domain(datesArr.map(function (d) {
       return d
     }))
-    .range([0, 500])
+    .range([0, 500 - margin])
   let xAxis = d3.axisBottom(xScale)
+
+  let dailyCasesExtent = d3.extent(dailyEvolution)
+  let yScale = d3.scaleLinear()
+    .domain(dailyCasesExtent)
+    .range([520, 0])
+  let yAxis = d3.axisLeft(yScale)
 
   // Instantiate the SVG for the line graph.
   let lineGraphInstance = d3.select(lineGraphDom)
@@ -34,7 +42,7 @@ const populateLineGraph = async (lineGraphDom, cases, dates) => {
   // Add the X axis to the svg. Only add a label every 9 days. Rotate labels to fit axis.
   lineGraphInstance.append("g")
     .attr("class", "x axis")
-    .attr("transform", "translate(" + 0 + "," + 520 + ")")
+    .attr("transform", "translate(" + margin + "," + 520 + ")")
     .call(xAxis.tickFormat(d3.timeFormat("%m/%d/%y"))
       .tickValues(xScale.domain()
         .filter(function (d, i) {
@@ -45,6 +53,11 @@ const populateLineGraph = async (lineGraphDom, cases, dates) => {
     .attr("dx", "-0.8em")
     .attr("dy", "0.15em")
     .attr("transform", "rotate(-90)")
+
+  lineGraphInstance.append("g")
+    .attr("class", "y axis")
+    .attr("transform", "translate(" + margin + ",0)")
+    .call(yAxis)
 }
 
 export {
