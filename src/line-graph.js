@@ -5,10 +5,19 @@ const populateLineGraph = async (lineGraphDom, cases, dates) => {
   dates.reverse()
   let dateExtent = d3.extent(dates)
 
-  // Build a new array of dates (Date objects instead of strings).
-  let datesArr = d3.timeDay.range(new Date(dateExtent[0]), new Date(dateExtent[1]));
+  // Calculate the number of new confirmed cases on a daily basis.
+  let totalCasesPerDay = []
+  dates.forEach(function (d) {
+    totalCasesPerDay.push(getCasesOnDay(cases, d))
+  })
+  let dailyEvolution = []
+  for (let i = 0; i < totalCasesPerDay.length - 1; i++) {
+    dailyEvolution.push(Math.abs(totalCasesPerDay[i] - totalCasesPerDay[i + 1]))
+  }
 
   // Prepare the X axis for the dates.
+  // Build a new array of dates (Date objects instead of strings).
+  let datesArr = d3.timeDay.range(new Date(dateExtent[0]), new Date(dateExtent[1]));
   let xScale = d3.scaleBand()
     .domain(datesArr.map(function (d) {
       return d
