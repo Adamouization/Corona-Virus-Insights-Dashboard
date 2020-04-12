@@ -1,32 +1,36 @@
-const getCasesOnDay = (cases, dateStr) => cases.map(country => Number(country[dateStr])).reduce((prev, next) => prev + next)
+import {getCasesOnDay} from "./utils.js"
 
 const populateLineGraph = async (lineGraphDom, cases, dates) => {
-  let dateExtent = d3.extent(dates.reverse())
+  // Reverse dates to have them in chronological order, and get the first and last date.
+  dates.reverse()
+  let dateExtent = d3.extent(dates)
 
-  let newDates = d3.timeDay.range(new Date(dateExtent[0]), new Date(dateExtent[1]));
-  console.log(newDates)
+  // Build a new array of dates (Date objects instead of strings).
+  let datesArr = d3.timeDay.range(new Date(dateExtent[0]), new Date(dateExtent[1]));
 
+  // Prepare the X axis for the dates.
   let xScale = d3.scaleBand()
-    .domain(newDates.map(function (d) {
+    .domain(datesArr.map(function (d) {
       return d
     }))
     .range([0, 500])
   let xAxis = d3.axisBottom(xScale)
-  console.log(xScale)
 
+  // Instantiate the SVG for the line graph.
   let lineGraphInstance = d3.select(lineGraphDom)
     .append("svg")
     .attr("width", "100vh")
     .attr("height", "100vh");
 
+  // Add the X axis to the svg. Only add a label every 9 days. Rotate labels to fit axis.
   lineGraphInstance.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(" + 0 + "," + 520 + ")")
     .call(xAxis.tickFormat(d3.timeFormat("%m/%d/%y"))
       .tickValues(xScale.domain()
-        .filter(function( d, i ) {
-            return !(i % 9)
-          })))
+        .filter(function (d, i) {
+          return !(i % 9)
+        })))
     .selectAll("text")
     .style("text-anchor", "end")
     .attr("dx", "-0.8em")
