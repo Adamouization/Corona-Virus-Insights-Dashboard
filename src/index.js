@@ -46,8 +46,10 @@ const buildCharts = async () => {
   await populateMap('#map', map, cases, currentDate)
   buildLollipopChart(caseBreakdownLollipopChart, 'case-breakdown', width, height,
     getCaseDetails(cases, deaths, recovered, currentDate))
-  populateLineGraph('#line-graph', cases, dates)
+  await populateLineGraph('#line-graph', cases, dates)
 }
+
+buildCharts().then(() => {})
 
 map.on('moveend', () => {
   d3.selectAll('countryCircles')
