@@ -10,9 +10,18 @@ const getByCountry = (country, cases) => cases.filter(item => item['Country/Regi
 
 const collapseByDate = (object, date) => object.map(item => item[date]).reduce((prev, next) => Number(prev) + Number(next), 0)
 
+/**
+ * Returns the number of confirmed cases across all countries on a single day.
+ * @param cases
+ * @param dateStr
+ * @returns {bigint}
+ */
+const getCasesOnDay = (cases, dateStr) => cases.map(country => Number(country[dateStr])).reduce((prev, next) => prev + next)
+
 export {
   isDate,
   getDatesFromTimeSeriesObject,
   getByCountry,
   collapseByDate,
+  getCasesOnDay
 }

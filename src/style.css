@@ -3,10 +3,48 @@
     position: absolute;
     height: 600px;
     margin:0;
-    padding:0; 
+    padding:0;
     border: 1px solid black;
     border-radius: 8px;
     }
+#line-graph{
+    width: 500px;
+    position: absolute;
+    height: 600px;
+    margin:0;
+    padding:0;
+    border: 1px solid black;
+    border-radius: 8px;
+}
+
+.line {
+    fill: none;
+    stroke: darkred;
+    stroke-width: 2;
+}
+
+/* AXES */
+/* ticks */
+.axis line{
+    stroke: #706f6f;
+    stroke-width: 0.5;
+    shape-rendering: crispEdges;
+}
+
+/* axis contour */
+.axis path {
+    stroke: #706f6f;
+    stroke-width: 0.7;
+    shape-rendering: crispEdges;
+}
+
+/* axis text */
+.axis text {
+    fill: #2b2929;
+    font-size: 100%;
+}
+
+
     .legend {
         line-height: 18px;
         color: #555;
@@ -18,15 +56,15 @@
         margin-right: 8px;
         opacity: 0.7;
     }
-    div.tooltip {	
-        position: absolute;			
-        text-align: center;			
-        width: 60px;					
-        height: 28px;					
-        padding: 2px;				
-        font: 12px sans-serif;		
-        background: lightsteelblue;	
-        border: 0px;		
-        border-radius: 8px;			
-        pointer-events: none;			
+    div.tooltip {
+        position: absolute;
+        text-align: center;
+        width: 60px;
+        height: 28px;
+        padding: 2px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 0px;
+        border-radius: 8px;
+        pointer-events: none;
     }
