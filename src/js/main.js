@@ -47,13 +47,8 @@ const buildCharts = async () => {
   const deaths = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv')
   const dates = Object.keys(getDatesFromTimeSeriesObject(cases[0]))
   const currentDate = dates.sort((a, b) => new Date(b) - new Date(a))[0]
-  await
-    populateMap('#map', map, cases, currentDate)
-    buildLollipopChart(caseBreakdownLollipopChart,
-                'case-breakdown',
-                      width,
-                      height,
-                      getCaseDetails(cases, deaths, recovered, currentDate))
+  await populateMap('#map', map, cases, currentDate)
+  buildLollipopChart(caseBreakdownLollipopChart, 'case-breakdown', width, height, getCaseDetails(cases, deaths, recovered, currentDate))
   await populateLineGraph('#line-graph', cases, dates)
 }
 
