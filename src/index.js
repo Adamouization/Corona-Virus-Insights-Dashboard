@@ -1,7 +1,7 @@
-import { getDatesFromTimeSeriesObject } from './utils.js'
-import { createMap, populateMap } from './map.js'
-import { populateLineGraph } from './line-graph.js'
-import { buildLollipopChart } from './lollipop.js'
+import {getDatesFromTimeSeriesObject} from './utils.js'
+import {populateMap} from './map.js'
+import {populateLineGraph} from './line-graph.js'
+import {buildLollipopChart} from './lollipop.js'
 
 const margin = {top: 10, right: 30, bottom: 40, left: 100},
   width = 460 - margin.left - margin.right,
@@ -27,14 +27,18 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 L.svg().addTo(map)
 
 const getCaseDetails = (cases, deaths, recovered, currentDate) => [
-  {reading: 'total',
+  {
+    reading: 'total',
     value: cases.map(country => Number(country[currentDate])).reduce((prev, next) => prev + next)
   },
-  {reading: 'deaths',
+  {
+    reading: 'deaths',
     value: deaths.map(country => Number(country[currentDate])).reduce((prev, next) => prev + next),
   },
-  {reading: 'recovered',
-    value: recovered.map(country => Number(country[currentDate])).reduce((prev, next) => prev + next)}]
+  {
+    reading: 'recovered',
+    value: recovered.map(country => Number(country[currentDate])).reduce((prev, next) => prev + next)
+  }]
 
 
 const buildCharts = async () => {
@@ -43,9 +47,13 @@ const buildCharts = async () => {
   const deaths = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv')
   const dates = Object.keys(getDatesFromTimeSeriesObject(cases[0]))
   const currentDate = dates.sort((a, b) => new Date(b) - new Date(a))[0]
-  await populateMap('#map', map, cases, currentDate)
-  buildLollipopChart(caseBreakdownLollipopChart, 'case-breakdown', width, height,
-    getCaseDetails(cases, deaths, recovered, currentDate))
+  await
+    populateMap('#map', map, cases, currentDate)
+    buildLollipopChart(caseBreakdownLollipopChart,
+                'case-breakdown',
+                      width,
+                      height,
+                      getCaseDetails(cases, deaths, recovered, currentDate))
   await populateLineGraph('#line-graph', cases, dates)
 }
 
