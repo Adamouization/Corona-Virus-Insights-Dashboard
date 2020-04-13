@@ -69,6 +69,13 @@ const populateLineGraph = async (lineGraphDom, cases, dates) => {
     .attr("class", "y axis")
     .attr("transform", "translate(" + margin + ",0)")
     .call(yAxis)
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("dy", ".75em")
+    .attr("y", 6)
+    .attr("dx", "-0.75em")
+    .style("text-anchor", "end")
+    .text("Confirmed cases")
 
   // Add the line to the svg.
   lineGraphInstance.append("path")
