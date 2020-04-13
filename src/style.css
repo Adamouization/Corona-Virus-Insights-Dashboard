@@ -16,10 +16,35 @@
     border: 1px solid black;
     border-radius: 8px;
 }
+
 .line {
     fill: none;
-    stroke: black;
+    stroke: darkred;
+    stroke-width: 2;
 }
+
+/* AXES */
+/* ticks */
+.axis line{
+    stroke: #706f6f;
+    stroke-width: 0.5;
+    shape-rendering: crispEdges;
+}
+
+/* axis contour */
+.axis path {
+    stroke: #706f6f;
+    stroke-width: 0.7;
+    shape-rendering: crispEdges;
+}
+
+/* axis text */
+.axis text {
+    fill: #2b2929;
+    font-size: 100%;
+}
+
+
     .legend {
         line-height: 18px;
         color: #555;
