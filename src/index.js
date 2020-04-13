@@ -23,6 +23,7 @@ d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_co
   .then(async cases => {
     const dates = Object.keys(getDatesFromTimeSeriesObject(cases[0]))
     populateMap('#map', map, cases, dates.sort((a, b) => new Date(b) - new Date(a))[0])
+    populateLineGraph('#line-graph', cases, dates)
   })
 
 map.on('moveend', update)
