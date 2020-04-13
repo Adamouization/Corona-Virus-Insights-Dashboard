@@ -14,5 +14,5 @@ export {
   isDate,
   getDatesFromTimeSeriesObject,
   getByCountry,
-  collapseByDate
+  collapseByDate,
 }

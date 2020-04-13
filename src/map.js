@@ -21,23 +21,24 @@ const createMap = mapboxAccessToken => {
 
 /**
  * A function to populate the map.
- * @param {*} style the styling function
+ * @param map the map id
+ * @param mapInstance the map instance
+ * @param cases the cases
+ * @param date the date to filter by
  */
 const populateMap = async (map, mapInstance, cases, date) => {
-  const geoData = await d3.csv('./data/countries.csv')
-  const mapFeatures = geoData.map(item => ({ ...item, cases: collapseByDate(getByCountry(item.name, cases), date) }))
   const size = d3.scaleSqrt()
-    .domain([Math.min(...mapFeatures.map(item => item.cases)), Math.max(...mapFeatures.map(item => item.cases))])
+    .domain([Math.min(...cases.map(item => item[date])), Math.max(...cases.map(item => item[date]))])
     .range([0, 50])
   d3.select(map)
     .select('svg')
     .selectAll('countryCircles')
-    .data(mapFeatures)
+    .data(cases)
     .enter()
     .append('circle')
-    .attr('cx', d => mapInstance.latLngToLayerPoint([d.latitude, d.longitude]).x)
-    .attr('cy', d => mapInstance.latLngToLayerPoint([d.latitude, d.longitude]).y)
-    .attr('r', d => size(d.cases))
+    .attr('cx', d => mapInstance.latLngToLayerPoint([d['Lat'], d['Long']]).x)
+    .attr('cy', d => mapInstance.latLngToLayerPoint([d['Lat'], d['Long']]).y)
+    .attr('r', d => size(d[date]))
     .style('fill', '#dc3545')
     .attr('stroke', '#dc3545')
     .attr('stroke-width', 3)
