@@ -36,6 +36,7 @@ const populateMap = async (map, mapInstance, cases, date) => {
     .data(cases)
     .enter()
     .append('circle')
+    .attr('class', 'mapCircle')
     .attr('cx', d => mapInstance.latLngToLayerPoint([d['Lat'], d['Long']]).x)
     .attr('cy', d => mapInstance.latLngToLayerPoint([d['Lat'], d['Long']]).y)
     .attr('r', d => size(d[date]))

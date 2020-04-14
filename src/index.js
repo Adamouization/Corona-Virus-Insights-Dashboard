@@ -50,9 +50,10 @@ const buildCharts = async () => {
 }
 
 buildCharts().then(() => {})
+// TODO selct id circles
 
 map.on('moveend', () => {
-  d3.selectAll('countryCircles')
+  d3.selectAll('.mapCircle')
     .attr('cx', d => map.latLngToLayerPoint([d['Lat'], d['Long']]).x)
     .attr('cy', d => map.latLngToLayerPoint([d['Lat'], d['Long']]).y)
 })
