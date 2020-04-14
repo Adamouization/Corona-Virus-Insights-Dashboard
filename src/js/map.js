@@ -1,4 +1,4 @@
-import { collapseByDate, getByCountry } from './utils.js'
+import {collapseByDate, getByCountry} from './utils.js'
 
 /**
  * A function to create a map object.
