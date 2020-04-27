@@ -1,6 +1,6 @@
-import {getCasesOnDay} from "./utils.js"
+import {buildDatesArr, getCasesOnDay} from "./utils.js"
 
-const margin = 50
+const margin = 55
 
 /**
  * Main function to build line graphs. Prepares the data and the axes before drawing the graph.
@@ -15,9 +15,9 @@ const populateDailyEvolutionLineGraph = (lineGraphDom, cases, recovered, deaths,
   dates.reverse()
 
   // Calculate the number of new confirmed cases on a daily basis.
-  const dailyEvolutionCases = _parseDailyEvolutionData(cases, dates)
-  const dailyEvolutionRecoveries = _parseDailyEvolutionData(recovered, dates)
-  const dailyEvolutionDeaths = _parseDailyEvolutionData(deaths, dates)
+  const dailyEvolutionCases = _parseDailyEvolution(_parseTotalDailyCases(cases, dates))
+  const dailyEvolutionRecoveries = _parseDailyEvolution(_parseTotalDailyCases(recovered, dates))
+  const dailyEvolutionDeaths = _parseDailyEvolution(_parseTotalDailyCases(deaths, dates))
 
   // Build a new array of dates (Date objects instead of strings).
   const datesArr = d3.timeDay.range(new Date(dates[0]), new Date(dates[dates.length - 1]));
@@ -48,16 +48,70 @@ const populateDailyEvolutionLineGraph = (lineGraphDom, cases, recovered, deaths,
 }
 
 /**
- * Gathers the daily evolutions of the passed dataset (cases/recoveries/deaths) into an Array.
+ *
+ * @param lineGraphDom
+ * @param cases
+ * @param recovered
+ * @param deaths
+ * @param dates
+ */
+const populateTotalOccurrencesLineGraph = (lineGraphDom, cases, recovered, deaths, dates) => {
+  // Reverse dates to have them in chronological order.
+
+  // Calculate the number of new confirmed cases on a daily basis.
+  const totalCases = _parseTotalDailyCases(cases, dates)
+  const totalRecoveries = _parseTotalDailyCases(recovered, dates)
+  const totalDeaths = _parseTotalDailyCases(deaths, dates)
+
+  // Build a new array of dates (Date objects instead of strings).
+  const datesArr = buildDatesArr(dates)
+
+  // Prepare the X axis for the dates.
+  const xScale = d3.scaleBand()
+    .domain(datesArr.map(function (d) {
+      return d
+    }))
+    .range([0, 500 - margin])
+  const xAxis = d3.axisBottom(xScale)
+
+  // Prepare the Y axis for the number of daily cases.
+  const dailyCasesExtent = d3.extent(totalCases)
+  const yScale = d3.scaleLinear()
+    .domain(dailyCasesExtent)
+    .range([520, 0])
+  const yAxis = d3.axisLeft(yScale)
+
+  // Prepare the individual d3js line graphs for each array.
+  const lines = [
+    _createD3Line(xScale, yScale, datesArr, totalCases),
+    _createD3Line(xScale, yScale, datesArr, totalRecoveries),
+    _createD3Line(xScale, yScale, datesArr, totalDeaths)
+  ]
+
+  _drawChart(lineGraphDom, xAxis, xScale, yAxis, datesArr, lines, ["Total confirmed cases", "Total recoveries", "Total deaths"])
+}
+
+/**
+ * Gathers the total number of cases after each day and stores them in a chronological Array.
  * @param data
  * @param dates
  * @returns {[]}
+ * @private
  */
-const _parseDailyEvolutionData = (data, dates) => {
+const _parseTotalDailyCases = (data, dates) => {
   let totalDaily = []
   dates.forEach(function (d) {
     totalDaily.push(getCasesOnDay(data, d))
   })
+  return totalDaily
+}
+
+/**
+ * Gathers the daily evolutions of the passed dataset (cases/recoveries/deaths) into an Array.
+ * @returns {[]}
+ * @param totalDaily
+ */
+const _parseDailyEvolution = (totalDaily) => {
   let dailyEvolution = []
   for (let i = 0; i < totalDaily.length - 1; i++) {
     dailyEvolution.push(Math.abs(totalDaily[i] - totalDaily[i + 1]))
@@ -205,5 +259,6 @@ const _drawLegend = (lineGraphInstance, colourScheme, legendLabels) => {
 }
 
 export {
-  populateDailyEvolutionLineGraph
+  populateDailyEvolutionLineGraph,
+  populateTotalOccurrencesLineGraph
 }
