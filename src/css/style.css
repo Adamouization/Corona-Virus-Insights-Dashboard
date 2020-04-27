@@ -37,7 +37,6 @@ div.tooltip {
 /* Line graph */
 .line {
     fill: none;
-    stroke: darkred;
     stroke-width: 2;
 }
 
