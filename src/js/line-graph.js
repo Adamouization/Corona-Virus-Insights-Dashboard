@@ -149,7 +149,7 @@ const _createD3Line = (xScale, yScale, datesArr, dailyEvolution) => {
  * @private
  */
 const _drawChart = (lineGraphDom, xAxis, xScale, yAxis, datesArr, lines, legendLabels) => {
-  const colourScheme = ["#FF9F1C", "#011627", "#E71D36"]
+  const colourScheme = ["#f6c23e", "#1cc88a", "#e74a3b"]
   const lineGraphInstance = _createSVGContainer(lineGraphDom)
   _drawAxes(lineGraphInstance, xAxis, xScale, yAxis)
   _drawLines(lineGraphInstance, datesArr, lines, colourScheme)
