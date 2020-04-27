@@ -44,7 +44,7 @@ const populateDailyEvolutionLineGraph = (lineGraphDom, cases, recovered, deaths,
     _createD3Line(xScale, yScale, datesArr, dailyEvolutionDeaths)
   ]
 
-  _drawChart(lineGraphDom, xAxis, xScale, yAxis, datesArr, lines)
+  _drawChart(lineGraphDom, xAxis, xScale, yAxis, datesArr, lines, ["Confirmed cases", "Recoveries", "Deaths"])
 }
 
 /**
@@ -91,14 +91,15 @@ const _createD3Line = (xScale, yScale, datesArr, dailyEvolution) => {
  * @param yAxis
  * @param datesArr
  * @param lines
+ * @param legendLabels
  * @private
  */
-const _drawChart = (lineGraphDom, xAxis, xScale, yAxis, datesArr, lines) => {
+const _drawChart = (lineGraphDom, xAxis, xScale, yAxis, datesArr, lines, legendLabels) => {
   const colourScheme = ["#FF9F1C", "#011627", "#E71D36"]
   const lineGraphInstance = _createSVGContainer(lineGraphDom)
   _drawAxes(lineGraphInstance, xAxis, xScale, yAxis)
   _drawLines(lineGraphInstance, datesArr, lines, colourScheme)
-  _drawLegend(lineGraphInstance, colourScheme, ["Confirmed cases", "Recoveries", "Deaths"])
+  _drawLegend(lineGraphInstance, colourScheme, legendLabels)
 }
 
 /**
