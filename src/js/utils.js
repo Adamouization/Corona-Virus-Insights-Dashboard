@@ -40,10 +40,18 @@ const collapseByDate = (object, date) => object.map(item => item[date]).reduce((
  */
 const getCasesOnDay = (cases, dateStr) => cases.map(country => Number(country[dateStr])).reduce((prev, next) => prev + next)
 
+/**
+ * Returns a sorted Array with all the dates found in the data.
+ * @param dates
+ * @returns {[]}
+ */
+const buildDatesArr = (dates) => d3.timeDay.range(new Date(dates[0]), new Date(dates[dates.length - 1]))
+
 export {
   isDate,
   getDatesFromTimeSeriesObject,
   getByCountry,
   collapseByDate,
-  getCasesOnDay
+  getCasesOnDay,
+  buildDatesArr
 }
