@@ -1,77 +1,44 @@
 import {getCasesOnDay} from "./utils.js"
 
 const populateDailyEvolutionLineGraph = async (lineGraphDom, cases, recovered, deaths, dates) => {
-  let margin = 50
-  let colourScheme = ["#FF9F1C", "#011627", "#E71D36"]
-  let legendLabels = ["Confirmed cases", "Recoveries", "Deaths"]
+  const margin = 50
+  const colourScheme = ["#FF9F1C", "#011627", "#E71D36"]
+  const legendLabels = ["Confirmed cases", "Recoveries", "Deaths"]
 
   // Reverse dates to have them in chronological order.
   dates.reverse()
 
   // Calculate the number of new confirmed cases on a daily basis.
-  let totalCasesPerDay = []
-  let totalRecoveriesPerDay = []
-  let totalDeathsPerDay = []
-  dates.forEach(function (d) {
-    totalCasesPerDay.push(getCasesOnDay(cases, d))
-    totalRecoveriesPerDay.push(getCasesOnDay(recovered, d))
-    totalDeathsPerDay.push(getCasesOnDay(deaths, d))
-  })
-  let dailyEvolutionCases = []
-  let dailyEvolutionRecoveries = []
-  let dailyEvolutionDeaths = []
-  for (let i = 0; i < totalCasesPerDay.length - 1; i++) {
-    dailyEvolutionCases.push(Math.abs(totalCasesPerDay[i] - totalCasesPerDay[i + 1]))
-    dailyEvolutionRecoveries.push(Math.abs(totalRecoveriesPerDay[i] - totalRecoveriesPerDay[i + 1]))
-    dailyEvolutionDeaths.push(Math.abs(totalDeathsPerDay[i] - totalDeathsPerDay[i + 1]))
-  }
+  const dailyEvolutionCases = _parseDailyEvolutionData(cases, dates)
+  const dailyEvolutionRecoveries = _parseDailyEvolutionData(recovered, dates)
+  const dailyEvolutionDeaths = _parseDailyEvolutionData(deaths, dates)
 
   // Prepare the X axis for the dates.
   // Build a new array of dates (Date objects instead of strings).
-  let datesArr = d3.timeDay.range(new Date(dates[0]), new Date(dates[dates.length - 1]));
-  let xScale = d3.scaleBand()
+  const datesArr = d3.timeDay.range(new Date(dates[0]), new Date(dates[dates.length - 1]));
+  const xScale = d3.scaleBand()
     .domain(datesArr.map(function (d) {
       return d
     }))
     .range([0, 500 - margin])
-  let xAxis = d3.axisBottom(xScale)
+  const xAxis = d3.axisBottom(xScale)
 
   // Prepare the Y axis for the number of daily cases.
-  let dailyCasesExtent = d3.extent(dailyEvolutionCases)
-  let yScale = d3.scaleLinear()
+  const dailyCasesExtent = d3.extent(dailyEvolutionCases)
+  const yScale = d3.scaleLinear()
     .domain(dailyCasesExtent)
     .range([520, 0])
-  let yAxis = d3.axisLeft(yScale)
+  const yAxis = d3.axisLeft(yScale)
 
-  // Prepare the line graph data for confirmed cases.
-  const lineCases = d3.line()
-    .x(function (d, i) {
-      return xScale(datesArr[i])
-    })
-    .y(function (d, i) {
-      return yScale(dailyEvolutionCases[i])
-    })
-
-  // Prepare the line graph data for recoveries.
-  const lineRecoveries = d3.line()
-    .x(function (d, i) {
-      return xScale(datesArr[i])
-    })
-    .y(function (d, i) {
-      return yScale(dailyEvolutionRecoveries[i])
-    })
-
-  // Prepare the line graph data for recoveries.
-  const lineDeaths = d3.line()
-    .x(function (d, i) {
-      return xScale(datesArr[i])
-    })
-    .y(function (d, i) {
-      return yScale(dailyEvolutionDeaths[i])
-    })
+  // Prepare the individual d3js line graphs for each array.
+  const lines = [
+    _createD3Line(xScale, yScale, datesArr, dailyEvolutionCases),
+    _createD3Line(xScale, yScale, datesArr, dailyEvolutionRecoveries),
+    _createD3Line(xScale, yScale, datesArr, dailyEvolutionDeaths)
+  ]
 
   // Instantiate the SVG for the line graph.
-  let lineGraphInstance = d3.select(lineGraphDom)
+  const lineGraphInstance = d3.select(lineGraphDom)
     .append("svg")
     .attr("width", "100vh")
     .attr("height", "100vh")
@@ -105,47 +72,68 @@ const populateDailyEvolutionLineGraph = async (lineGraphDom, cases, recovered, d
     .style("text-anchor", "end")
     .text("Confirmed cases")
 
-  // Add the confirmed cases line to the svg.
-  lineGraphInstance.append("path")
-    .datum(datesArr)
-    .attr("class", "line")
-    .attr("d", lineCases)
-    .attr("transform", "translate(" + margin + ",0)")  // translate by the same amount as the Y axis.
-    .style("stroke", colourScheme[0])
-
-  // Add the confirmed cases line to the svg.
-  lineGraphInstance.append("path")
-    .datum(datesArr)
-    .attr("class", "line")
-    .attr("d", lineRecoveries)
-    .attr("transform", "translate(" + margin + ",0)")  // translate by the same amount as the Y axis.
-    .style("stroke", colourScheme[1])
-
-  // Add the confirmed cases line to the svg.
-  lineGraphInstance.append("path")
-    .datum(datesArr)
-    .attr("class", "line")
-    .attr("d", lineDeaths)
-    .attr("transform", "translate(" + margin + ",0)")  // translate by the same amount as the Y axis.
-    .style("stroke", colourScheme[2])
-
-  // Add a legend.
-  let legend = lineGraphInstance.append("g").attr("transform", "translate(100, -180)")
+  // Draw the lines.
   for (let i = 0; i < 3; i++) {
-    let legendRow = legend.append("g").attr("transform", "translate(0, " + (200 + (i * 20)) + ")");
-    legendRow.append("rect")
-      .attr("width", 10)
-      .attr("height", 10)
+    lineGraphInstance.append("path")
+      .datum(datesArr)
+      .attr("class", "line")
+      .attr("d", lines[i])
+      .attr("transform", "translate(" + margin + ",0)")  // translate by the same amount as the Y axis.
+      .style("stroke", colourScheme[i])
+  }
+
+  // Add the legend.
+  const legend = lineGraphInstance.append("g").attr("transform", "translate(100, -180)")
+  for (let i = 0; i < 3; i++) {
+    let row = legend.append("g").attr("transform", "translate(0, " + (200 + (i * 25)) + ")");
+    row.append("rect")
+      .attr("width", 20)
+      .attr("height", 4)
       .attr("fill", colourScheme[i])
       .attr("stroke", "black")
-    legendRow.append("text")
+    row.append("text")
       .attr("x", -10)
       .attr("y", 10)
       .attr("text-anchor", "start")
-      .attr("transform", "translate(25, 0)")
-      .text(legendLabels[i]);
+      .attr("transform", "translate(35, -2)")
+      .text(legendLabels[i])
   }
+}
 
+/**
+ *
+ * @param data
+ * @param dates
+ * @returns {[]}
+ */
+const _parseDailyEvolutionData = (data, dates) => {
+  let totalDaily = []
+  dates.forEach(function (d) {
+    totalDaily.push(getCasesOnDay(data, d))
+  })
+  let dailyEvolution = []
+  for (let i = 0; i < totalDaily.length - 1; i++) {
+    dailyEvolution.push(Math.abs(totalDaily[i] - totalDaily[i + 1]))
+  }
+  return dailyEvolution
+}
+
+/**
+ *
+ * @param xScale
+ * @param yScale
+ * @param datesArr
+ * @param dailyEvolution
+ * @returns {*}
+ */
+const _createD3Line = (xScale, yScale, datesArr, dailyEvolution) => {
+  return d3.line()
+    .x(function (d, i) {
+      return xScale(datesArr[i])
+    })
+    .y(function (d, i) {
+      return yScale(dailyEvolution[i])
+    })
 }
 
 export {
