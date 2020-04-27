@@ -19,16 +19,17 @@ const map = createMap(mapboxAccessToken).setView([47, 2], 5)
  * @param date the date
  * @returns {{features: Uint8Array | BigInt64Array | {geometry: {coordinates: [number, number, number], type: string}, type: string, properties: {cases, name}}[] | Float64Array | Int8Array | Float32Array | Int32Array | Uint32Array | Uint8ClampedArray | BigUint64Array | Int16Array | Uint16Array, type: string}}
  */
-const getGeoJsonFromCases = (cases, date) => ({
+const getGeoJsonFromCases = (cases, recoveries, deaths, date) => ({
   type: "FeatureCollection",
-  features: cases.filter(reading => !reading['Province/State']).map(reading => ({
+  features: cases.map(reading => ({
     type: "Feature",
     geometry: {
       type: "Point",
       coordinates: [Number(reading['Long']), Number(reading['Lat']), 0]
     },
     properties: {
-      name: reading['Country/Region'],
+      'Country': reading['Country/Region'],
+      'State': reading['Province/State'],
       cases: Number(reading[date])
     },
   }))
@@ -78,7 +79,7 @@ const buildCharts = async () => {
   const dates = Object.keys(getDatesFromTimeSeriesObject(cases[0]))
   const currentDate = dates.sort((a, b) => new Date(b) - new Date(a))[0]
   // await populateMap('#map', map, cases, currentDate)
-  const geoJSON = getGeoJsonFromCases(cases, currentDate)
+  const geoJSON = getGeoJsonFromCases(cases, recovered, deaths, currentDate)
   bubbleLayer(geoJSON, { property: 'cases', legend: true, tooltip: true, style: mapBubbleStyle()}).addTo(map)
   buildLollipopChart(caseBreakdownLollipopChart, 'case-breakdown', width, height, getCaseDetails(cases, deaths, recovered, currentDate))
   populateDailyEvolutionLineGraph('#line-graph-daily-evolution', cases, recovered, deaths, dates)
