@@ -81,7 +81,8 @@ const buildCharts = async () => {
   const geoJSON = getGeoJsonFromCases(cases, currentDate)
   bubbleLayer(geoJSON, { property: 'cases', legend: true, tooltip: true, style: mapBubbleStyle()}).addTo(map)
   buildLollipopChart(caseBreakdownLollipopChart, 'case-breakdown', width, height, getCaseDetails(cases, deaths, recovered, currentDate))
-  await populateDailyEvolutionLineGraph('#line-graph-daily-evolution', cases, recovered, deaths, dates)
+  populateDailyEvolutionLineGraph('#line-graph-daily-evolution', cases, recovered, deaths, dates)
+  populateDailyEvolutionLineGraph('#line-graph-total', cases, recovered, deaths, dates)
 }
 
 // Build the charts

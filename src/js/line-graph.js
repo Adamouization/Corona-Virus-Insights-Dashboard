@@ -1,6 +1,6 @@
 import {getCasesOnDay} from "./utils.js"
 
-const populateDailyEvolutionLineGraph = async (lineGraphDom, cases, recovered, deaths, dates) => {
+const populateDailyEvolutionLineGraph = (lineGraphDom, cases, recovered, deaths, dates) => {
   const margin = 50
   const colourScheme = ["#FF9F1C", "#011627", "#E71D36"]
   const legendLabels = ["Confirmed cases", "Recoveries", "Deaths"]
@@ -83,7 +83,8 @@ const populateDailyEvolutionLineGraph = async (lineGraphDom, cases, recovered, d
   }
 
   // Add the legend.
-  const legend = lineGraphInstance.append("g").attr("transform", "translate(100, -180)")
+  const legend = lineGraphInstance.append("g")
+    .attr("transform", "translate(100, -180)")
   for (let i = 0; i < 3; i++) {
     let row = legend.append("g").attr("transform", "translate(0, " + (200 + (i * 25)) + ")");
     row.append("rect")
