@@ -1,5 +1,5 @@
 import {getDatesFromTimeSeriesObject} from './utils.js'
-import {populateLineGraph} from './line-graph.js'
+import {populateDailyEvolutionLineGraph} from './line-graph.js'
 import {buildLollipopChart} from './lollipop.js'
 import {bubbleLayer} from './bubble.js'
 import {createMap} from './map.js'
@@ -81,7 +81,8 @@ const buildCharts = async () => {
   const geoJSON = getGeoJsonFromCases(cases, currentDate)
   bubbleLayer(geoJSON, { property: 'cases', legend: true, tooltip: true, style: mapBubbleStyle()}).addTo(map)
   buildLollipopChart(caseBreakdownLollipopChart, 'case-breakdown', width, height, getCaseDetails(cases, deaths, recovered, currentDate))
-  await populateLineGraph('#line-graph', cases, dates)
+  populateDailyEvolutionLineGraph('#line-graph-daily-evolution', cases, recovered, deaths, dates)
+  populateDailyEvolutionLineGraph('#line-graph-total', cases, recovered, deaths, dates)
 }
 
 // Build the charts
