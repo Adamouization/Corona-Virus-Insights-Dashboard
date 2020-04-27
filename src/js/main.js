@@ -16,10 +16,13 @@ const map = createMap(mapboxAccessToken).setView([47, 2], 5)
 /**
  * A function to construct a mapping to a geojson object from the case timeseries
  * @param cases the cases
+ * @param recoveries a list of objects of countries and their recoveries
+ * @param deaths a list of objects of countries and their deaths
+ * @param isoPopulation a list of object of all the countries + state listed in the data set along with their population and lat longitude
  * @param date the date
  * @returns {{features: Uint8Array | BigInt64Array | {geometry: {coordinates: [number, number, number], type: string}, type: string, properties: {cases, name}}[] | Float64Array | Int8Array | Float32Array | Int32Array | Uint32Array | Uint8ClampedArray | BigUint64Array | Int16Array | Uint16Array, type: string}}
  */
-const getGeoJsonFromCases = (cases, recoveries, deaths, date) => ({
+const getGeoJsonFromCases = (cases, recoveries, deaths, isoPopulation, date) => ({
   type: "FeatureCollection",
   features: cases.map(reading => ({
     type: "Feature",
@@ -28,10 +31,26 @@ const getGeoJsonFromCases = (cases, recoveries, deaths, date) => ({
       coordinates: [Number(reading['Long']), Number(reading['Lat']), 0]
     },
     properties: {
-      'Country': reading['Country/Region'],
-      'State': reading['Province/State'],
-      cases: Number(reading[date])
+      'Name': reading['Province/State'] || reading['Country/Region'],
+      cases: Number(reading[date]),
+      recovered: _.get(recoveries.filter(recovery => recovery['Province/State'] === reading['Province/State'])
+        .filter(recovery => recovery['Country/Region'] === reading['Country/Region']), ['0', date], 0),
+      deaths: _.get(deaths.filter(death => death['Province/State'] === reading['Province/State'])
+        .filter(death => death['Country/Region'] === reading['Country/Region']), ['0', date], 0),
+      population: isoPopulation.filter(country => country['Province_State'] === reading['Province/State'])
+        .filter(country => country['Country_Region'] === reading['Country/Region'])[0]['Population']
     },
+  }))
+})
+
+const standardiseGeoJson = geoJson => ({
+  type: "FeatureCollection",
+  features: geoJson.features.map(feature => ({...feature,
+    properties: {
+    ...feature.properties,
+      'Infections per 1000': feature.properties.cases / feature.properties.population * 1000,
+      'Mortality Rate': feature.properties.deaths / feature.properties.cases
+  }
   }))
 })
 
@@ -73,13 +92,14 @@ const getCaseDetails = (cases, deaths, recovered, currentDate) => [
  * @returns {Promise<void>}
  */
 const buildCharts = async () => {
+  const latLongIso = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv')
   const cases = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
   const recovered = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv')
   const deaths = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv')
   const dates = Object.keys(getDatesFromTimeSeriesObject(cases[0]))
   const currentDate = dates.sort((a, b) => new Date(b) - new Date(a))[0]
   // await populateMap('#map', map, cases, currentDate)
-  const geoJSON = getGeoJsonFromCases(cases, recovered, deaths, currentDate)
+  const geoJSON = standardiseGeoJson(getGeoJsonFromCases(cases, recovered, deaths, latLongIso, currentDate))
   bubbleLayer(geoJSON, { property: 'cases', legend: true, tooltip: true, style: mapBubbleStyle()}).addTo(map)
   buildLollipopChart(caseBreakdownLollipopChart, 'case-breakdown', width, height, getCaseDetails(cases, deaths, recovered, currentDate))
   await populateLineGraph('#line-graph', cases, dates)
