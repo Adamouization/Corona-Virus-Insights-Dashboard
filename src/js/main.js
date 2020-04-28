@@ -102,8 +102,8 @@ const buildCharts = async () => {
   const geoJSON = standardiseGeoJson(getGeoJsonFromCases(cases, recovered, deaths, latLongIso, currentDate))
   bubbleLayer(geoJSON, { property: 'cases', legend: true, tooltip: true, style: mapBubbleStyle()}).addTo(map)
   buildLollipopChart(caseBreakdownLollipopChart, 'case-breakdown', width, height, getCaseDetails(cases, deaths, recovered, currentDate))
-  populateDailyEvolutionLineGraph('#line-graph-daily-evolution', cases, recovered, deaths, dates)
-  populateTotalOccurrencesLineGraph('#line-graph-total', cases, recovered, deaths, dates)
+  populateDailyEvolutionLineGraph('#line-graph-daily-evolution', 250, 600, cases, recovered, deaths, dates)
+  populateTotalOccurrencesLineGraph('#line-graph-total', 300, 1600, cases, recovered, deaths, dates)
 }
 
 // Build the charts
