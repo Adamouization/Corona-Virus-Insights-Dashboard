@@ -7,7 +7,7 @@ import {mapBubbleStyle} from './style.js'
 
 const margin = {top: 10, right: 30, bottom: 40, left: 100},
   width = 460 - margin.left - margin.right,
-  height = 500 - margin.top - margin.bottom
+  height = 240 - margin.top - margin.bottom
 
 const mapboxAccessToken = 'pk.eyJ1IjoibWF0dGRyYWdvOTgiLCJhIjoiY2s4MWhia2l0MDUyZTNmb2Rqa2x1YjV0NiJ9.XmI1DncVRdyUOl_yhifSJQ'
 
@@ -102,8 +102,8 @@ const buildCharts = async () => {
   const geoJSON = standardiseGeoJson(getGeoJsonFromCases(cases, recovered, deaths, latLongIso, currentDate))
   bubbleLayer(geoJSON, { property: 'cases', legend: true, tooltip: true, style: mapBubbleStyle()}).addTo(map)
   buildLollipopChart(caseBreakdownLollipopChart, 'case-breakdown', width, height, getCaseDetails(cases, deaths, recovered, currentDate))
-  populateDailyEvolutionLineGraph('#line-graph-daily-evolution', cases, recovered, deaths, dates)
-  populateTotalOccurrencesLineGraph('#line-graph-total', cases, recovered, deaths, dates)
+  populateDailyEvolutionLineGraph('#line-graph-daily-evolution', height, 600, cases, recovered, deaths, dates)
+  populateTotalOccurrencesLineGraph('#line-graph-total', 300, 1600, cases, recovered, deaths, dates)
 }
 
 // Build the charts

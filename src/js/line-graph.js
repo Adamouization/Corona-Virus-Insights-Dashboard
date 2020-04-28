@@ -4,13 +4,15 @@ const margin = 55
 
 /**
  * Main function to build line graphs. Prepares the data and the axes before drawing the graph.
- * @param lineGraphDom
+ * @param domElement
+ * @param height
+ * @param width
  * @param cases
  * @param recovered
  * @param deaths
  * @param dates
  */
-const populateDailyEvolutionLineGraph = (lineGraphDom, cases, recovered, deaths, dates) => {
+const populateDailyEvolutionLineGraph = (domElement, height, width, cases, recovered, deaths, dates) => {
   // Reverse dates to have them in chronological order.
   dates.reverse()
 
@@ -20,21 +22,15 @@ const populateDailyEvolutionLineGraph = (lineGraphDom, cases, recovered, deaths,
   const dailyEvolutionDeaths = _parseDailyEvolution(_parseTotalDailyCases(deaths, dates))
 
   // Build a new array of dates (Date objects instead of strings).
-  const datesArr = d3.timeDay.range(new Date(dates[0]), new Date(dates[dates.length - 1]));
+  const datesArr = buildDatesArr(dates)
 
   // Prepare the X axis for the dates.
-  const xScale = d3.scaleBand()
-    .domain(datesArr.map(function (d) {
-      return d
-    }))
-    .range([0, 500 - margin])
+  const xScale = _getXScale(datesArr, width)
   const xAxis = d3.axisBottom(xScale)
 
   // Prepare the Y axis for the number of daily cases.
   const dailyCasesExtent = d3.extent(dailyEvolutionCases)
-  const yScale = d3.scaleLinear()
-    .domain(dailyCasesExtent)
-    .range([520, 0])
+  const yScale = _getYScale(d3.extent(dailyCasesExtent), height)
   const yAxis = d3.axisLeft(yScale)
 
   // Prepare the individual d3js line graphs for each array.
@@ -44,18 +40,20 @@ const populateDailyEvolutionLineGraph = (lineGraphDom, cases, recovered, deaths,
     _createD3Line(xScale, yScale, datesArr, dailyEvolutionDeaths)
   ]
 
-  _drawChart(lineGraphDom, xAxis, xScale, yAxis, datesArr, lines, ["Confirmed cases", "Recoveries", "Deaths"])
+  _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Confirmed cases", "Recoveries", "Deaths"])
 }
 
 /**
  *
- * @param lineGraphDom
+ * @param domElement
+ * @param height
+ * @param width
  * @param cases
  * @param recovered
  * @param deaths
  * @param dates
  */
-const populateTotalOccurrencesLineGraph = (lineGraphDom, cases, recovered, deaths, dates) => {
+const populateTotalOccurrencesLineGraph = (domElement, height, width, cases, recovered, deaths, dates) => {
   // Reverse dates to have them in chronological order.
 
   // Calculate the number of new confirmed cases on a daily basis.
@@ -67,18 +65,11 @@ const populateTotalOccurrencesLineGraph = (lineGraphDom, cases, recovered, death
   const datesArr = buildDatesArr(dates)
 
   // Prepare the X axis for the dates.
-  const xScale = d3.scaleBand()
-    .domain(datesArr.map(function (d) {
-      return d
-    }))
-    .range([0, 500 - margin])
+  const xScale = _getXScale(datesArr, width)
   const xAxis = d3.axisBottom(xScale)
 
-  // Prepare the Y axis for the number of daily cases.
-  const dailyCasesExtent = d3.extent(totalCases)
-  const yScale = d3.scaleLinear()
-    .domain(dailyCasesExtent)
-    .range([520, 0])
+  // Prepare the Y axis for the number of occurrences.
+  const yScale = _getYScale(d3.extent(totalCases), height)
   const yAxis = d3.axisLeft(yScale)
 
   // Prepare the individual d3js line graphs for each array.
@@ -88,7 +79,7 @@ const populateTotalOccurrencesLineGraph = (lineGraphDom, cases, recovered, death
     _createD3Line(xScale, yScale, datesArr, totalDeaths)
   ]
 
-  _drawChart(lineGraphDom, xAxis, xScale, yAxis, datesArr, lines, ["Total confirmed cases", "Total recoveries", "Total deaths"])
+  _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Total confirmed cases", "Total recoveries", "Total deaths"])
 }
 
 /**
@@ -120,6 +111,34 @@ const _parseDailyEvolution = (totalDaily) => {
 }
 
 /**
+ * Prepares the X Axis D3Js object.
+ * @param datesArr
+ * @param width
+ * @returns {*}
+ * @private
+ */
+const _getXScale = (datesArr, width) => {
+  return d3.scaleBand()
+    .domain(datesArr.map(function (d) {
+      return d
+    }))
+    .range([0, width - margin])
+}
+
+/**
+ * Prepares the Y Axis D3Js object.
+ * @param data
+ * @param height
+ * @returns {*}
+ * @private
+ */
+const _getYScale = (data, height) => {
+  return d3.scaleLinear()
+    .domain(data)
+    .range([height, 0])
+}
+
+/**
  * Creates a D3JS line object to draw the array values on the graph.
  * @param xScale
  * @param yScale
@@ -139,7 +158,8 @@ const _createD3Line = (xScale, yScale, datesArr, dailyEvolution) => {
 
 /**
  * Groups functions used to draw the graph.
- * @param lineGraphDom
+ * @param domElement
+ * @param height
  * @param xAxis
  * @param xScale
  * @param yAxis
@@ -148,26 +168,27 @@ const _createD3Line = (xScale, yScale, datesArr, dailyEvolution) => {
  * @param legendLabels
  * @private
  */
-const _drawChart = (lineGraphDom, xAxis, xScale, yAxis, datesArr, lines, legendLabels) => {
-  const colourScheme = ["#FF9F1C", "#011627", "#E71D36"]
-  const lineGraphInstance = _createSVGContainer(lineGraphDom)
-  _drawAxes(lineGraphInstance, xAxis, xScale, yAxis)
+const _drawChart = (domElement, height, xAxis, xScale, yAxis, datesArr, lines, legendLabels) => {
+  const colourScheme = ["#f6c23e", "#1cc88a", "#e74a3b"]
+  const lineGraphInstance = _createSVGContainer(domElement, height)
+  _drawAxes(lineGraphInstance, height, xAxis, xScale, yAxis)
   _drawLines(lineGraphInstance, datesArr, lines, colourScheme)
   _drawLegend(lineGraphInstance, colourScheme, legendLabels)
 }
 
 /**
  * Creates the SVG element in which the graph will be drawn.
- * @param lineGraphDom
+ * @param domElement
+ * @param height
  * @returns {jQuery}
  * @private
  */
-const _createSVGContainer = (lineGraphDom) => {
+const _createSVGContainer = (domElement, height) => {
   // Instantiate the SVG for the line graph.
-  return d3.select(lineGraphDom)
+  return d3.select(domElement)
     .append("svg")
-    .attr("width", "100vh")
-    .attr("height", "100vh")
+    .attr("width", "100%")
+    .attr("height", height + margin + "px")
 }
 
 /**
@@ -178,11 +199,11 @@ const _createSVGContainer = (lineGraphDom) => {
  * @param yAxis
  * @private
  */
-const _drawAxes = (lineGraphInstance, xAxis, xScale, yAxis) => {
+const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis) => {
   // Add the X axis to the svg. Only add a label every 8 days. Rotate labels to fit axis.
   lineGraphInstance.append("g")
     .attr("class", "x axis")
-    .attr("transform", "translate(" + margin + "," + 520 + ")")
+    .attr("transform", "translate(" + margin + "," + height + ")")
     .call(xAxis
       .tickFormat(d3.timeFormat("%m/%d/%y"))
       .tickValues(xScale.domain()
