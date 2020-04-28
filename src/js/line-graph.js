@@ -266,7 +266,7 @@ const _drawLegend = (lineGraphInstance, colours, legendLabels) => {
     .attr("transform", "translate(100, -180)")
 
   for (let i = 0; i < legendLabels.length; i++) {
-    let row = legend.append("g").attr("transform", "translate(0, " + (200 + (i * 25)) + ")");
+    let row = legend.append("g").attr("transform", "translate(0, " + (200 + (i * 25)) + ")")
     row.append("rect")
       .attr("width", 20)
       .attr("height", 4)
