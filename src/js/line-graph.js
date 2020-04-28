@@ -1,18 +1,18 @@
 import {buildDatesArr, getCasesOnDay} from "./utils.js"
-
-const margin = 55
+import {colourScheme, margin} from "./style.js"
 
 /**
  * Main function to build line graphs. Prepares the data and the axes before drawing the graph.
  * @param domElement
  * @param height
  * @param width
+ * @param labelSpacing
  * @param cases
  * @param recovered
  * @param deaths
  * @param dates
  */
-const populateDailyEvolutionLineGraph = (domElement, height, width, cases, recovered, deaths, dates) => {
+const populateDailyEvolutionLineGraph = (domElement, height, width, labelSpacing, cases, recovered, deaths, dates) => {
   // Reverse dates to have them in chronological order.
   dates.reverse()
 
@@ -40,7 +40,7 @@ const populateDailyEvolutionLineGraph = (domElement, height, width, cases, recov
     _createD3Line(xScale, yScale, datesArr, dailyEvolutionDeaths)
   ]
 
-  _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Confirmed cases", "Recoveries", "Deaths"])
+  _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Confirmed cases", "Recoveries", "Deaths"], labelSpacing)
 }
 
 /**
@@ -48,12 +48,13 @@ const populateDailyEvolutionLineGraph = (domElement, height, width, cases, recov
  * @param domElement
  * @param height
  * @param width
+ * @param labelSpacing
  * @param cases
  * @param recovered
  * @param deaths
  * @param dates
  */
-const populateTotalOccurrencesLineGraph = (domElement, height, width, cases, recovered, deaths, dates) => {
+const populateTotalOccurrencesLineGraph = (domElement, height, width, labelSpacing, cases, recovered, deaths, dates) => {
   // Reverse dates to have them in chronological order.
 
   // Calculate the number of new confirmed cases on a daily basis.
@@ -79,7 +80,7 @@ const populateTotalOccurrencesLineGraph = (domElement, height, width, cases, rec
     _createD3Line(xScale, yScale, datesArr, totalDeaths)
   ]
 
-  _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Total confirmed cases", "Total recoveries", "Total deaths"])
+  _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Total confirmed cases", "Total recoveries", "Total deaths"], labelSpacing)
 }
 
 /**
@@ -166,14 +167,15 @@ const _createD3Line = (xScale, yScale, datesArr, dailyEvolution) => {
  * @param datesArr
  * @param lines
  * @param legendLabels
+ * @param labelSpacing
  * @private
  */
-const _drawChart = (domElement, height, xAxis, xScale, yAxis, datesArr, lines, legendLabels) => {
-  const colourScheme = ["#f6c23e", "#1cc88a", "#e74a3b"]
+const _drawChart = (domElement, height, xAxis, xScale, yAxis, datesArr, lines, legendLabels, labelSpacing) => {
+  const colours = [colourScheme.warning, colourScheme.success, colourScheme.danger]
   const lineGraphInstance = _createSVGContainer(domElement, height)
-  _drawAxes(lineGraphInstance, height, xAxis, xScale, yAxis)
-  _drawLines(lineGraphInstance, datesArr, lines, colourScheme)
-  _drawLegend(lineGraphInstance, colourScheme, legendLabels)
+  _drawAxes(lineGraphInstance, height, xAxis, xScale, yAxis, labelSpacing)
+  _drawLines(lineGraphInstance, datesArr, lines, colours)
+  _drawLegend(lineGraphInstance, colours, legendLabels)
 }
 
 /**
@@ -194,12 +196,14 @@ const _createSVGContainer = (domElement, height) => {
 /**
  * Draws the X and Y axes and formats the labels.
  * @param lineGraphInstance
+ * @param height
  * @param xAxis
  * @param xScale
  * @param yAxis
+ * @param labelSpacing
  * @private
  */
-const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis) => {
+const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis, labelSpacing) => {
   // Add the X axis to the svg. Only add a label every 8 days. Rotate labels to fit axis.
   lineGraphInstance.append("g")
     .attr("class", "x axis")
@@ -208,7 +212,7 @@ const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis) => {
       .tickFormat(d3.timeFormat("%m/%d/%y"))
       .tickValues(xScale.domain()
         .filter(function (d, i) {
-          return !(i % 8)
+          return !(i % labelSpacing)
         })))
     .selectAll("text")
     .style("text-anchor", "end")
@@ -235,10 +239,10 @@ const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis) => {
  * @param lineGraphInstance
  * @param datesArr
  * @param lines
- * @param colourScheme
+ * @param colours
  * @private
  */
-const _drawLines = (lineGraphInstance, datesArr, lines, colourScheme) => {
+const _drawLines = (lineGraphInstance, datesArr, lines, colours) => {
   // Draw the lines.
   for (let i = 0; i < 3; i++) {
     lineGraphInstance.append("path")
@@ -246,20 +250,18 @@ const _drawLines = (lineGraphInstance, datesArr, lines, colourScheme) => {
       .attr("class", "line")
       .attr("d", lines[i])
       .attr("transform", "translate(" + margin + ",0)")  // translate by the same amount as the Y axis.
-      .style("stroke", colourScheme[i])
+      .style("stroke", colours[i])
   }
 }
 
 /**
  * Draws the legend to allow the colour scheme to be understood when visualised.
  * @param lineGraphInstance
- * @param colourScheme
+ * @param colours
  * @param legendLabels
  * @private
  */
-const _drawLegend = (lineGraphInstance, colourScheme, legendLabels) => {
-  // Add the legend.
-
+const _drawLegend = (lineGraphInstance, colours, legendLabels) => {
   const legend = lineGraphInstance.append("g")
     .attr("transform", "translate(100, -180)")
 
@@ -268,7 +270,7 @@ const _drawLegend = (lineGraphInstance, colourScheme, legendLabels) => {
     row.append("rect")
       .attr("width", 20)
       .attr("height", 4)
-      .attr("fill", colourScheme[i])
+      .attr("fill", colours[i])
       .attr("stroke", "black")
     row.append("text")
       .attr("x", -10)
