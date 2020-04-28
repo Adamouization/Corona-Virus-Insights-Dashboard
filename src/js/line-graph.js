@@ -6,12 +6,13 @@ import {colourScheme, margin} from "./style.js"
  * @param domElement
  * @param height
  * @param width
+ * @param labelSpacing
  * @param cases
  * @param recovered
  * @param deaths
  * @param dates
  */
-const populateDailyEvolutionLineGraph = (domElement, height, width, cases, recovered, deaths, dates) => {
+const populateDailyEvolutionLineGraph = (domElement, height, width, labelSpacing, cases, recovered, deaths, dates) => {
   // Reverse dates to have them in chronological order.
   dates.reverse()
 
@@ -39,7 +40,7 @@ const populateDailyEvolutionLineGraph = (domElement, height, width, cases, recov
     _createD3Line(xScale, yScale, datesArr, dailyEvolutionDeaths)
   ]
 
-  _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Confirmed cases", "Recoveries", "Deaths"])
+  _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Confirmed cases", "Recoveries", "Deaths"], labelSpacing)
 }
 
 /**
@@ -47,12 +48,13 @@ const populateDailyEvolutionLineGraph = (domElement, height, width, cases, recov
  * @param domElement
  * @param height
  * @param width
+ * @param labelSpacing
  * @param cases
  * @param recovered
  * @param deaths
  * @param dates
  */
-const populateTotalOccurrencesLineGraph = (domElement, height, width, cases, recovered, deaths, dates) => {
+const populateTotalOccurrencesLineGraph = (domElement, height, width, labelSpacing, cases, recovered, deaths, dates) => {
   // Reverse dates to have them in chronological order.
 
   // Calculate the number of new confirmed cases on a daily basis.
@@ -78,7 +80,7 @@ const populateTotalOccurrencesLineGraph = (domElement, height, width, cases, rec
     _createD3Line(xScale, yScale, datesArr, totalDeaths)
   ]
 
-  _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Total confirmed cases", "Total recoveries", "Total deaths"])
+  _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Total confirmed cases", "Total recoveries", "Total deaths"], labelSpacing)
 }
 
 /**
@@ -165,12 +167,13 @@ const _createD3Line = (xScale, yScale, datesArr, dailyEvolution) => {
  * @param datesArr
  * @param lines
  * @param legendLabels
+ * @param labelSpacing
  * @private
  */
-const _drawChart = (domElement, height, xAxis, xScale, yAxis, datesArr, lines, legendLabels) => {
+const _drawChart = (domElement, height, xAxis, xScale, yAxis, datesArr, lines, legendLabels, labelSpacing) => {
   const colours = [colourScheme.warning, colourScheme.success, colourScheme.danger]
   const lineGraphInstance = _createSVGContainer(domElement, height)
-  _drawAxes(lineGraphInstance, height, xAxis, xScale, yAxis)
+  _drawAxes(lineGraphInstance, height, xAxis, xScale, yAxis, labelSpacing)
   _drawLines(lineGraphInstance, datesArr, lines, colours)
   _drawLegend(lineGraphInstance, colours, legendLabels)
 }
@@ -197,9 +200,10 @@ const _createSVGContainer = (domElement, height) => {
  * @param xAxis
  * @param xScale
  * @param yAxis
+ * @param labelSpacing
  * @private
  */
-const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis) => {
+const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis, labelSpacing) => {
   // Add the X axis to the svg. Only add a label every 8 days. Rotate labels to fit axis.
   lineGraphInstance.append("g")
     .attr("class", "x axis")
@@ -208,7 +212,7 @@ const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis) => {
       .tickFormat(d3.timeFormat("%m/%d/%y"))
       .tickValues(xScale.domain()
         .filter(function (d, i) {
-          return !(i % 8)
+          return !(i % labelSpacing)
         })))
     .selectAll("text")
     .style("text-anchor", "end")
