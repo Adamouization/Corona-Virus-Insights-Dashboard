@@ -5,10 +5,7 @@ import {bubbleLayer} from './bubble.js'
 import {createMap} from './map.js'
 import {mapBubbleStyle} from './style.js'
 
-
-
 const mapboxAccessToken = 'pk.eyJ1IjoibWF0dGRyYWdvOTgiLCJhIjoiY2s4MWhia2l0MDUyZTNmb2Rqa2x1YjV0NiJ9.XmI1DncVRdyUOl_yhifSJQ'
-
 const map = createMap(mapboxAccessToken).setView([47, 2], 5)
 
 /**
