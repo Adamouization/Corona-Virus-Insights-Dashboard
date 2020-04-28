@@ -47,6 +47,7 @@ const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'r
  * @private
  */
 const _createSVGContainer = (height) => {
+  d3.select('#case-breakdown').select('svg').remove()
   return d3.select("#case-breakdown")
     .append("svg")
     .attr("width", "100%")
