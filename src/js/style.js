@@ -20,7 +20,10 @@ const colourScheme = {
   secondary: "#858796",
 }
 
+const margin = 60
+
 export {
   mapBubbleStyle,
-  colourScheme
+  colourScheme,
+  margin
 }

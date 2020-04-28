@@ -1,7 +1,7 @@
 import {buildDatesArr, getCasesOnDay} from "./utils.js"
 import {colourScheme} from "./style.js"
 
-const margin = 55
+const margin = 50
 
 /**
  * Main function to build line graphs. Prepares the data and the axes before drawing the graph.

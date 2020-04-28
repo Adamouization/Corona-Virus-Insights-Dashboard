@@ -1,35 +1,14 @@
-import {colourScheme} from "./style.js"
+import {colourScheme, margin} from "./style.js"
 
-const xAxis = (width, max) => d3.scaleLinear()
-  .domain([0, max])
-  .range([0, width])
+const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'reading') => {
+  const chart = _createSVGContainer(height)
 
-const yAxis = (height, categories) => d3.scaleBand()
-  .range([0, height])
-  // .domain(data.map(function(d) { return d[selector]; }))
-  .domain(categories)
-  .padding(1)
+  // Axes
+  const x = _getXAxis(data, width)
+  const y = _getYAxis(height, data.map(item => item[yKey]))
+  _drawAxes(chart, height, x, y)
 
-const buildAxis = (chart, height, xAxisFunction, yAxisFunction) => {
-  chart.append('g')
-    .attr('transform', `translate(0,${height})`)
-    .call(d3.axisBottom(xAxisFunction))
-    .selectAll('text')
-    .attr('transform', 'translate(-10,0)rotate(-45)')
-    .style('text-anchor', 'end')
-  chart.append('g')
-    .call(d3.axisLeft(yAxisFunction))
-}
-
-const buildLollipopChart = (chart, name, width, height, data, xKey = 'value', yKey = 'reading') => {
-  const x = d3.scaleLinear()
-    .domain([0, d3.max(data, function (d) {
-      return d.value
-    })])
-    .range([0, width])
-  const y = yAxis(height, data.map(item => item[yKey]))
   // Lines
-  buildAxis(chart, height, x, y)
   chart.selectAll(`line${name}lollipop`)
     .data(data)
     .enter()
@@ -39,6 +18,7 @@ const buildLollipopChart = (chart, name, width, height, data, xKey = 'value', yK
     .attr('y1', d => y(d[yKey]))
     .attr('y2', d => y(d[yKey]))
     .attr('stroke', 'grey')
+
   // Circles
   chart.selectAll(`circle${name}lollipop`)
     .data(data)
@@ -58,6 +38,65 @@ const buildLollipopChart = (chart, name, width, height, data, xKey = 'value', yK
     .transition()
     .duration(2000)
     .attr('x1', d => x(d[xKey]))
+}
+
+/**
+ * Creates the SVG that will hold the lollipop chart.
+ * @param height
+ * @returns {jQuery}
+ * @private
+ */
+const _createSVGContainer = (height) => {
+  return d3.select("#case-breakdown")
+    .append("svg")
+    .attr("width", "100%")
+    .attr("height", height)
+    .append("g")
+    .attr("transform", "translate(" + margin + ",0)")
+}
+
+/**
+ * Create X axis.
+ * @param data
+ * @param width
+ * @returns {*}
+ */
+const _getXAxis = (data, width) => {
+  return d3.scaleLinear()
+    .domain([0, d3.max(data, function (d) {
+      return d.value
+    })])
+    .range([0, width - margin])
+}
+
+/**
+ * Create Y axis.
+ * @param height
+ * @param categories
+ * @returns {*}
+ */
+const _getYAxis = (height, categories) => d3.scaleBand()
+  .range([0, height - margin])
+  // .domain(data.map(function(d) { return d[selector]; }))
+  .domain(categories)
+  .padding(1)
+
+/**
+ * Draw the axes.
+ * @param chart
+ * @param height
+ * @param xAxisFunction
+ * @param yAxisFunction
+ */
+const _drawAxes = (chart, height, xAxisFunction, yAxisFunction) => {
+  chart.append('g')
+    .attr('transform', 'translate(0, ' + (height - margin) + ')')
+    .call(d3.axisBottom(xAxisFunction))
+    .selectAll('text')
+    .attr('transform', 'translate(-10,10)rotate(-65)')
+    .style('text-anchor', 'end')
+  chart.append('g')
+    .call(d3.axisLeft(yAxisFunction))
 }
 
 export {
