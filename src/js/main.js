@@ -5,6 +5,8 @@ import {bubbleLayer} from './bubble.js'
 import {createMap} from './map.js'
 import {mapBubbleStyle} from './style.js'
 
+window.graphData = {}
+
 const margin = {top: 10, right: 30, bottom: 40, left: 100},
   width = 460 - margin.left - margin.right,
   height = 240 - margin.top - margin.bottom
@@ -87,9 +89,17 @@ const getCaseDetails = (cases, deaths, recovered, currentDate) => [
     value: recovered.map(country => Number(country[currentDate])).reduce((prev, next) => prev + next)
   }]
 
+const onBubble = e => {
+  const { properties } = e.sourceTarget.feature
+  const {cases, recovered, deaths} = window.graphData
+  const filter = reading => reading['Country/Region'] === properties['Name']
+  populateDailyEvolutionLineGraph('#line-graph-daily-evolution', height, 600,
+    cases.filter(filter), recovered.filter(filter), deaths.filter(filter),
+    Object.keys(getDatesFromTimeSeriesObject(cases[0])))
+}
 /**
  * An function to build the charts
- * @returns {Promise<void>}
+ * @returns {Promise<object>}
  */
 const buildCharts = async () => {
   const latLongIso = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv')
@@ -100,14 +110,36 @@ const buildCharts = async () => {
   const currentDate = dates.sort((a, b) => new Date(b) - new Date(a))[0]
   // await populateMap('#map', map, cases, currentDate)
   const geoJSON = standardiseGeoJson(getGeoJsonFromCases(cases, recovered, deaths, latLongIso, currentDate))
-  bubbleLayer(geoJSON, { property: 'cases', legend: true, tooltip: true, style: mapBubbleStyle()}).addTo(map)
+  bubbleLayer(geoJSON, { property: 'cases', onBubbleClick: onBubble, legend: true, tooltip: true, style: mapBubbleStyle()}).addTo(map)
   buildLollipopChart(caseBreakdownLollipopChart, 'case-breakdown', width, height, getCaseDetails(cases, deaths, recovered, currentDate))
-  populateDailyEvolutionLineGraph('#line-graph-daily-evolution', height, 600, cases, recovered, deaths, dates)
-  populateTotalOccurrencesLineGraph('#line-graph-total', 300, 1600, cases, recovered, deaths, dates)
+  populateDailyEvolutionLineGraph('#line-graph-daily-evolution', height, 600, cases, recovered, deaths, dates.reverse())
+  populateTotalOccurrencesLineGraph('#line-graph-total', 300, 1600, cases, recovered, deaths, dates.reverse())
+  return {
+    latLongIso,
+    cases,
+    recovered,
+    deaths
+  }
 }
 
 // Build the charts
-buildCharts().then(() => {})
+buildCharts().then((data) => {
+  window.graphData = data
+  document.getElementById('search-button').addEventListener('click', e => {
+    const query = document.getElementById('search-query').value.toLowerCase()
+    const { latLongIso } = data
+    const countriesFiltered = latLongIso
+      .filter(country => country['Country_Region'].toLowerCase() === query
+        || country['Province_State'].toLowerCase() === query)
+    if (countriesFiltered.length === 0 || query === '') {
+      document.getElementById('search-query').classList.add('is-invalid')
+      document.getElementById('validation-msg').innerHTML = 'That country or state does not exist.'
+    } else {
+      document.getElementById('search-query').classList.remove('is-invalid')
+      map.panTo(new L.LatLng(countriesFiltered[0]['Lat'], countriesFiltered[0]['Long_']), {animate: true, duration: 0.75})
+    }
+  })
+})
 
 // Update on move
 map.on('moveend', () => {

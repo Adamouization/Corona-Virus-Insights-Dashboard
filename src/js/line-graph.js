@@ -14,7 +14,7 @@ const margin = 55
  */
 const populateDailyEvolutionLineGraph = (domElement, height, width, cases, recovered, deaths, dates) => {
   // Reverse dates to have them in chronological order.
-  dates.reverse()
+  d3.select(domElement).select('svg').remove()
 
   // Calculate the number of new confirmed cases on a daily basis.
   const dailyEvolutionCases = _parseDailyEvolution(_parseTotalDailyCases(cases, dates))

@@ -4,7 +4,6 @@ const xAxis = (width, max) => d3.scaleLinear()
 
 const yAxis = (height, categories) => d3.scaleBand()
   .range([0, height])
-  // .domain(data.map(function(d) { return d[selector]; }))
   .domain(categories)
   .padding(1)
 

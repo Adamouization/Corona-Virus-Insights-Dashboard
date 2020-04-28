@@ -43,6 +43,8 @@ L.BubbleLayer = (L.Layer ? L.Layer : L.Class).extend({
       fillOpacity: 0.5
     }
 
+    options.onBubbleClick = options.hasOwnProperty('onBubbleClick') ? options.onBubbleClick : _ => {}
+
     L.setOptions(this, options)
 
     //TODO: throw error if invalid.
@@ -117,7 +119,7 @@ L.BubbleLayer = (L.Layer ? L.Layer : L.Class).extend({
     if (this.options.scale) {
       fill_scale = chroma.scale(this.options.scale)
     }
-
+    const onclick = this.options.onBubbleClick
     return new L.geoJson(this._geojson, {
 
       pointToLayer: function (feature, latlng) {
@@ -136,7 +138,7 @@ L.BubbleLayer = (L.Layer ? L.Layer : L.Class).extend({
         style.color = chroma(style.fillColor).darken().hex()
 
         // Create the circleMarker object
-        return L.circleMarker(latlng, style)
+        return L.circleMarker(latlng, style).on('click', onclick)
       }
     })
   },
