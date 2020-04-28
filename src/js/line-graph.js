@@ -1,4 +1,5 @@
 import {buildDatesArr, getCasesOnDay} from "./utils.js"
+import {colourScheme} from "./style.js"
 
 const margin = 55
 
@@ -169,11 +170,11 @@ const _createD3Line = (xScale, yScale, datesArr, dailyEvolution) => {
  * @private
  */
 const _drawChart = (domElement, height, xAxis, xScale, yAxis, datesArr, lines, legendLabels) => {
-  const colourScheme = ["#f6c23e", "#1cc88a", "#e74a3b"]
+  const colours = [colourScheme.warning, colourScheme.success, colourScheme.danger]
   const lineGraphInstance = _createSVGContainer(domElement, height)
   _drawAxes(lineGraphInstance, height, xAxis, xScale, yAxis)
-  _drawLines(lineGraphInstance, datesArr, lines, colourScheme)
-  _drawLegend(lineGraphInstance, colourScheme, legendLabels)
+  _drawLines(lineGraphInstance, datesArr, lines, colours)
+  _drawLegend(lineGraphInstance, colours, legendLabels)
 }
 
 /**
@@ -194,6 +195,7 @@ const _createSVGContainer = (domElement, height) => {
 /**
  * Draws the X and Y axes and formats the labels.
  * @param lineGraphInstance
+ * @param height
  * @param xAxis
  * @param xScale
  * @param yAxis
@@ -235,10 +237,10 @@ const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis) => {
  * @param lineGraphInstance
  * @param datesArr
  * @param lines
- * @param colourScheme
+ * @param colours
  * @private
  */
-const _drawLines = (lineGraphInstance, datesArr, lines, colourScheme) => {
+const _drawLines = (lineGraphInstance, datesArr, lines, colours) => {
   // Draw the lines.
   for (let i = 0; i < 3; i++) {
     lineGraphInstance.append("path")
@@ -246,20 +248,18 @@ const _drawLines = (lineGraphInstance, datesArr, lines, colourScheme) => {
       .attr("class", "line")
       .attr("d", lines[i])
       .attr("transform", "translate(" + margin + ",0)")  // translate by the same amount as the Y axis.
-      .style("stroke", colourScheme[i])
+      .style("stroke", colours[i])
   }
 }
 
 /**
  * Draws the legend to allow the colour scheme to be understood when visualised.
  * @param lineGraphInstance
- * @param colourScheme
+ * @param colours
  * @param legendLabels
  * @private
  */
-const _drawLegend = (lineGraphInstance, colourScheme, legendLabels) => {
-  // Add the legend.
-
+const _drawLegend = (lineGraphInstance, colours, legendLabels) => {
   const legend = lineGraphInstance.append("g")
     .attr("transform", "translate(100, -180)")
 
@@ -268,7 +268,7 @@ const _drawLegend = (lineGraphInstance, colourScheme, legendLabels) => {
     row.append("rect")
       .attr("width", 20)
       .attr("height", 4)
-      .attr("fill", colourScheme[i])
+      .attr("fill", colours[i])
       .attr("stroke", "black")
     row.append("text")
       .attr("x", -10)

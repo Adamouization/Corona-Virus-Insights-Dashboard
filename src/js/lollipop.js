@@ -1,3 +1,5 @@
+import {colourScheme} from "./style.js"
+
 const xAxis = (width, max) => d3.scaleLinear()
   .domain([0, max])
   .range([0, width])
@@ -45,7 +47,7 @@ const buildLollipopChart = (chart, name, width, height, data, xKey = 'value', yK
     .attr('cx', (d) => x(d[xKey]))
     .attr('cy', (d) => y(d[yKey]))
     .attr('r', '4')
-    .style('fill', '#69b3a2')
+    .style('fill', colourScheme.primary)
     .attr('stroke', 'black')
   chart.selectAll(`circle${name}lollipop`)
     .transition()

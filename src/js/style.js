@@ -7,6 +7,20 @@ const mapBubbleStyle = () => ({
   fillOpacity: 0.5
 })
 
+/**
+ * JS object for the colour scheme.
+ * @type {{secondary: string, success: string, warning: string, danger: string, primary: string, info: string}}
+ */
+const colourScheme = {
+  primary: "#4e73df",
+  success: "#1cc88a",
+  info: "#36b9cc",
+  warning: "#f6c23e",
+  danger: "#e74a3b",
+  secondary: "#858796",
+}
+
 export {
-  mapBubbleStyle
+  mapBubbleStyle,
+  colourScheme
 }
