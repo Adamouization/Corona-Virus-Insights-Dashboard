@@ -220,6 +220,7 @@ const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis, labelSpacing
         })))
     .selectAll("text")
     .style("text-anchor", "end")
+    .style('font-size', "12px")
     .attr("dx", "-0.8em")
     .attr("dy", "-0.15em")
     .attr("transform", "rotate(-65)")
@@ -228,6 +229,7 @@ const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis, labelSpacing
   lineGraphInstance.append("g")
     .attr("class", "y axis")
     .attr("transform", "translate(" + margin + ",0)")
+    .style('font-size', "12px")
     .call(yAxis)
     .append("text")
     .attr("transform", "rotate(-90)")
@@ -235,7 +237,7 @@ const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis, labelSpacing
     .attr("y", 6)
     .attr("dx", "-0.75em")
     .style("text-anchor", "end")
-    .text("Confirmed cases")
+    .text("Occurrences")
 }
 
 /**
