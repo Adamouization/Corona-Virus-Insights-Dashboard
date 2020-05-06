@@ -176,8 +176,6 @@ function populateCards(data) {
   const currentDate = dates[dates.length - 1]
   const previousDate = dates[dates.length - 2]
 
-  debugger;
-
   // Update the cards
   document.getElementById('card-date').innerHTML = currentDate
   document.getElementById('card-total-confirmed-cases').innerHTML = numberWithCommas(getCasesOnDay(data.cases, currentDate))
