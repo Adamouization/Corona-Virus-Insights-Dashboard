@@ -1,4 +1,4 @@
-import {getCasesOnDay, getCurrentDate, getDates, numberWithCommas} from './utils.js'
+import {getCasesOnDay, getCurrentDate, getDates, numberWithCommas, getDatesFromTimeSeriesObject} from './utils.js'
 import {deleteLineChart, populateDailyEvolutionLineGraph, populateTotalOccurrencesLineGraph} from './line-graph.js'
 import {buildLollipopChart, deleteLollipopChart} from './lollipop.js'
 import {bubbleLayer} from './bubble.js'
@@ -130,6 +130,7 @@ const onBubble = e => {
   const {cases, recovered, deaths} = window.graphData
   applyCountryFilter(properties['Name'], cases, recovered, deaths)
   createFilterBreadCrumb(properties['Name'], e => {
+    e.currentTarget.parentNode.parentNode.remove()
     buildCharts(window.graphData).then(() => {
     })
   })
