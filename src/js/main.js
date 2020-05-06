@@ -7,11 +7,6 @@ import {mapBubbleStyle} from './style.js'
 
 window.graphData = {}
 
-const margin = {top: 10, right: 30, bottom: 40, left: 100},
-  width = 460 - margin.left - margin.right,
-  height = 240 - margin.top - margin.bottom
-
-
 const mapboxAccessToken = 'pk.eyJ1IjoibWF0dGRyYWdvOTgiLCJhIjoiY2s4MWhia2l0MDUyZTNmb2Rqa2x1YjV0NiJ9.XmI1DncVRdyUOl_yhifSJQ'
 const map = createMap(mapboxAccessToken).setView([47, 2], 5)
 
@@ -45,6 +40,11 @@ const getGeoJsonFromCases = (cases, recoveries, deaths, isoPopulation, date) => 
   }))
 })
 
+/**
+ *
+ * @param geoJson
+ * @returns {{features: {properties: {"Mortality Rate": number, "Infections per 1000": number}}[], type: string}}
+ */
 const standardiseGeoJson = geoJson => ({
   type: "FeatureCollection",
   features: geoJson.features.map(feature => ({...feature,
@@ -78,6 +78,13 @@ const getCaseDetails = (cases, recovered, deaths, currentDate) => [
     value: recovered.map(country => Number(country[currentDate])).reduce((prev, next) => prev + next)
   }]
 
+/**
+ *
+ * @param name
+ * @param cases
+ * @param recovered
+ * @param deaths
+ */
 const applyCountryFilter = (name, cases, recovered, deaths) => {
   const filter = reading => reading['Country/Region'] === name
   const filteredCases = cases.filter(filter)
@@ -93,6 +100,12 @@ const applyCountryFilter = (name, cases, recovered, deaths) => {
     Object.keys(getDatesFromTimeSeriesObject(cases[0])).sort((a, b) => new Date(b) - new Date(a))[0]))
 }
 
+/**
+ *
+ * @param name
+ * @param onclick
+ * @param filterParent
+ */
 const createFilterBreadCrumb = (name, onclick, filterParent='filter-container') => {
   const template = document.createElement('div')
   template.innerHTML = `<button class="btn btn-secondary">
@@ -103,6 +116,10 @@ const createFilterBreadCrumb = (name, onclick, filterParent='filter-container') 
   document.getElementById(filterParent).appendChild(template)
 }
 
+/**
+ *
+ * @param e
+ */
 const onBubble = e => {
   const { properties } = e.sourceTarget.feature
   const {cases, recovered, deaths} = window.graphData
@@ -112,6 +129,7 @@ const onBubble = e => {
     buildCharts().then(() => {})
   })
 }
+
 /**
  * An function to build the charts
  * @returns {Promise<object>}
@@ -126,16 +144,37 @@ const buildCharts = async () => {
   const geoJSON = standardiseGeoJson(getGeoJsonFromCases(cases, recovered, deaths, latLongIso, currentDate))
   removeMarkers(map, 'bubblelayer')
   bubbleLayer(geoJSON, { property: 'cases', onBubbleClick: onBubble, legend: true, tooltip: true, style: mapBubbleStyle()}).addTo(map)
-  buildLollipopChart('case-breakdown', 215, 600, getCaseDetails(cases, recovered, deaths, currentDate))
+
+  // Lollipop chart
+  const lollipopChartDivId  = "case-breakdown"
+  buildLollipopChart(lollipopChartDivId, 212, document.getElementById(lollipopChartDivId).offsetWidth - 15, getCaseDetails(cases, recovered, deaths, currentDate))
+
+  // Line charts
   const dates = Object.keys(getDatesFromTimeSeriesObject(cases[0]))
-  populateDailyEvolutionLineGraph('#line-graph-daily-evolution', 210, 600, 8, cases, recovered, deaths, dates)
-  populateTotalOccurrencesLineGraph('#line-graph-total', 300, 1600, 2, cases, recovered, deaths, dates)
+  const lineChartDailyDivId  = "line-graph-daily-evolution"
+  const lineChartTotalDivId  = "line-graph-total"
+  populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 210, document.getElementById(lineChartDailyDivId).offsetWidth, 8, cases, recovered, deaths, dates)
+  populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, cases, recovered, deaths, dates)
   return {
     latLongIso,
     cases,
     recovered,
     deaths
   }
+}
+
+/**
+ * Populates the 4 cards at the top of the dashboard.
+ */
+function populateCards(data) {
+  const dates = Object.keys(getDatesFromTimeSeriesObject(data.cases[0]))
+  const currentDate = dates[dates.length - 1]
+  const previousDate = dates[dates.length - 2]
+
+  // Update the cards
+  document.getElementById('card-date').innerHTML = currentDate
+  document.getElementById('card-total-confirmed-cases').innerHTML = numberWithCommas(getCasesOnDay(data.cases, currentDate))
+  document.getElementById('card-confirmed-cases-today').innerHTML = numberWithCommas(Math.abs(getCasesOnDay(data.cases, currentDate) - getCasesOnDay(data.cases, previousDate)))
 }
 
 // Build the charts
@@ -158,7 +197,6 @@ buildCharts().then((data) => {
 
   // Populate the 4 cards at the top with the latest data.
   populateCards(data)
-
 })
 
 // Update on move
@@ -167,17 +205,3 @@ map.on('moveend', () => {
     .attr('cx', d => map.latLngToLayerPoint([d['Lat'], d['Long']]).x)
     .attr('cy', d => map.latLngToLayerPoint([d['Lat'], d['Long']]).y)
 })
-
-/**
- * Populates the 4 cards at the top of the dashboard.
- */
-function populateCards(data) {
-  const dates = Object.keys(getDatesFromTimeSeriesObject(data.cases[0]))
-  const currentDate = dates[dates.length - 1]
-  const previousDate = dates[dates.length - 2]
-
-  // Update the cards
-  document.getElementById('card-date').innerHTML = currentDate
-  document.getElementById('card-total-confirmed-cases').innerHTML = numberWithCommas(getCasesOnDay(data.cases, currentDate))
-  document.getElementById('card-confirmed-cases-today').innerHTML = numberWithCommas(Math.abs(getCasesOnDay(data.cases, currentDate) - getCasesOnDay(data.cases, previousDate)))
-}
