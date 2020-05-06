@@ -67,9 +67,9 @@ const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'r
     .attr('cy', (d) => y(d[yKey]))
     .attr('r', (d, i) => {
       if (i === 0) {
-        return x(d[xKey]) * 0.07
+        return x(d[xKey]) * 0.06
       } else {
-        return x(d[xKey]) * 0.15
+        return x(d[xKey]) * 0.14
       }
     })
     .style('fill', (d, i) => {
