@@ -47,11 +47,14 @@ const getCasesOnDay = (cases, dateStr) => cases.map(country => Number(country[da
  */
 const buildDatesArr = (dates) => d3.timeDay.range(new Date(dates[0]), new Date(dates[dates.length - 1]))
 
+const getCurrentDate = (cases) => Object.keys(getDatesFromTimeSeriesObject(cases[0])).sort((a, b) => new Date(b) - new Date(a))[0]
+
 export {
   isDate,
   getDatesFromTimeSeriesObject,
   getByCountry,
   collapseByDate,
   getCasesOnDay,
-  buildDatesArr
+  buildDatesArr,
+  getCurrentDate
 }

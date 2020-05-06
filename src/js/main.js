@@ -1,4 +1,4 @@
-import {getDatesFromTimeSeriesObject} from './utils.js'
+import {getCurrentDate, getDatesFromTimeSeriesObject} from './utils.js'
 import {populateDailyEvolutionLineGraph, populateTotalOccurrencesLineGraph} from './line-graph.js'
 import {buildLollipopChart} from './lollipop.js'
 import {bubbleLayer} from './bubble.js'
@@ -121,7 +121,7 @@ const buildCharts = async () => {
   const cases = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
   const recovered = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv')
   const deaths = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv')
-  const currentDate = Object.keys(getDatesFromTimeSeriesObject(cases[0])).sort((a, b) => new Date(b) - new Date(a))[0]
+  const currentDate = getCurrentDate(cases)
   // await populateMap('#map', map, cases, currentDate)
   const geoJSON = standardiseGeoJson(getGeoJsonFromCases(cases, recovered, deaths, latLongIso, currentDate))
   removeMarkers(map, 'bubblelayer')
@@ -155,6 +155,9 @@ buildCharts().then((data) => {
       map.panTo(new L.LatLng(countriesFiltered[0]['Lat'], countriesFiltered[0]['Long_']), {animate: true, duration: 0.75})
     }
   })
+
+  // Update Dates card
+  document.getElementById('card-date').innerHTML = getCurrentDate(data.cases)
 })
 
 // Update on move
