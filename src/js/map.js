@@ -19,6 +19,15 @@ const createMap = mapboxAccessToken => {
   return map
 }
 
+const removeMarkers = (map, layerTag) => {
+  map.eachLayer( function(layer) {
+    if ( layer.myTag &&  layer.myTag === layerTag) {
+      map.removeLayer(layer)
+    }
+  })
+}
+
 export {
   createMap,
+  removeMarkers
 }

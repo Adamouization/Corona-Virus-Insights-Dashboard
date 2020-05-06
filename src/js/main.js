@@ -2,7 +2,7 @@ import {getDatesFromTimeSeriesObject} from './utils.js'
 import {populateDailyEvolutionLineGraph, populateTotalOccurrencesLineGraph} from './line-graph.js'
 import {buildLollipopChart} from './lollipop.js'
 import {bubbleLayer} from './bubble.js'
-import {createMap} from './map.js'
+import {createMap, removeMarkers} from './map.js'
 import {mapBubbleStyle} from './style.js'
 
 window.graphData = {}
@@ -91,13 +91,26 @@ const applyCountryFilter = (name, cases, recovered, deaths) => {
     Object.keys(getDatesFromTimeSeriesObject(cases[0])))
   buildLollipopChart('case-breakdown', 215, 600, getCaseDetails(filteredCases, filteredRecoveries, filteredDeaths,
     Object.keys(getDatesFromTimeSeriesObject(cases[0])).sort((a, b) => new Date(b) - new Date(a))[0]))
+}
 
+const createFilterBreadCrumb = (name, onclick, filterParent='filter-container') => {
+  const template = document.createElement('div')
+  template.innerHTML = `<button class="btn btn-secondary">
+                            <span class="txt">${name}</span>
+                            <span class="round"><i class="fas text-gray-300 fa-times"></i></span>
+                        </button>`
+  template.firstChild.childNodes[3].firstChild.addEventListener('click', onclick)
+  document.getElementById(filterParent).appendChild(template)
 }
 
 const onBubble = e => {
   const { properties } = e.sourceTarget.feature
   const {cases, recovered, deaths} = window.graphData
   applyCountryFilter(properties['Name'], cases, recovered, deaths)
+  createFilterBreadCrumb(properties['Name'], e => {
+    console.log('test')
+    buildCharts().then(() => {})
+  })
 }
 /**
  * An function to build the charts
@@ -111,6 +124,7 @@ const buildCharts = async () => {
   const currentDate = Object.keys(getDatesFromTimeSeriesObject(cases[0])).sort((a, b) => new Date(b) - new Date(a))[0]
   // await populateMap('#map', map, cases, currentDate)
   const geoJSON = standardiseGeoJson(getGeoJsonFromCases(cases, recovered, deaths, latLongIso, currentDate))
+  removeMarkers(map, 'bubblelayer')
   bubbleLayer(geoJSON, { property: 'cases', onBubbleClick: onBubble, legend: true, tooltip: true, style: mapBubbleStyle()}).addTo(map)
   buildLollipopChart('case-breakdown', 215, 600, getCaseDetails(cases, recovered, deaths, currentDate))
   const dates = Object.keys(getDatesFromTimeSeriesObject(cases[0]))
