@@ -1,4 +1,4 @@
-import {getCasesOnDay, getCurrentDate, getDates, numberWithCommas} from './utils.js'
+import {getCasesOnDay, getCurrentDate, getDates, numberWithCommas, getDatesFromTimeSeriesObject} from './utils.js'
 import {deleteLineChart, populateDailyEvolutionLineGraph, populateTotalOccurrencesLineGraph} from './line-graph.js'
 import {buildLollipopChart, deleteLollipopChart} from './lollipop.js'
 import {bubbleLayer} from './bubble.js'
@@ -6,6 +6,9 @@ import {createMap, removeMarkers} from './map.js'
 import {mapBubbleStyle} from './style.js'
 
 window.graphData = {}
+window.filters = {
+  country: ''
+}
 const lineChartDailyDivId = "line-graph-daily-evolution"
 const lineChartTotalDivId = "line-graph-total"
 const lollipopChartDivId = "case-breakdown"
@@ -127,8 +130,8 @@ const onBubble = e => {
   const {cases, recovered, deaths} = window.graphData
   applyCountryFilter(properties['Name'], cases, recovered, deaths)
   createFilterBreadCrumb(properties['Name'], e => {
-    console.log('test')
-    buildCharts().then(() => {
+    e.currentTarget.parentNode.parentNode.remove()
+    buildCharts(window.graphData).then(() => {
     })
   })
 }
@@ -151,13 +154,10 @@ function populateCards(data) {
  * An function to build the charts
  * @returns {Promise<object>}
  */
-const buildCharts = async () => {
-  const latLongIso = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv')
-  const cases = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
-  const recovered = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv')
-  const deaths = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv')
-  const currentDate = getCurrentDate(cases)
-  // await populateMap('#map', map, cases, currentDate)
+
+const buildCharts = async (data, date=undefined) => {
+  const { latLongIso, cases, recovered, deaths } = data
+  const currentDate = date || getCurrentDate(cases)
   const geoJSON = standardiseGeoJson(getGeoJsonFromCases(cases, recovered, deaths, latLongIso, currentDate))
   removeMarkers(map, 'bubblelayer')
   bubbleLayer(geoJSON, {
@@ -172,7 +172,6 @@ const buildCharts = async () => {
   const lollipopChart = buildLollipopChart(lollipopChartDivId, 212, document.getElementById(lollipopChartDivId).offsetWidth - 35, getCaseDetails(cases, recovered, deaths, currentDate))
   const svgLineChartDaily = populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 210, document.getElementById(lineChartDailyDivId).offsetWidth, 8, cases, recovered, deaths, getDates(cases))
   const svgLineChartTotal = populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, cases, recovered, deaths, getDates(cases))
-
   return {
     latLongIso,
     cases,
@@ -180,14 +179,35 @@ const buildCharts = async () => {
     deaths,
     svgLineChartDaily,
     svgLineChartTotal,
-    lollipopChart
+    lollipopChart,
+    currentDate,
   }
 }
 
-// Build the charts
-buildCharts()
-  // then add functionality to the search bar, populate the cards and add dynamic resizing
-  .then((data) => {
+/**
+ * A function to asynchronously load the data
+ * @returns {Promise<{recovered: *, cases: *, latLongIso: *, currentDate, deaths: *}>}
+ */
+const loadData = async () => {
+  const dataSources = await Promise.all([
+    d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv'),
+    d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'),
+    d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv'),
+    d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv')
+  ])
+  const currentDate = Object.keys(getDatesFromTimeSeriesObject(dataSources[1])).sort((a, b) => new Date(b) - new Date(a))[0]
+  return {
+    latLongIso: dataSources[0],
+    cases: dataSources[1],
+    recovered: dataSources[2],
+    deaths: dataSources[3],
+    currentDate,
+  }
+}
+
+loadData().then(data => {
+  window.graphData = data
+  buildCharts(window.graphData).then((data) => {
     window.graphData = data
 
     // Populate the 4 cards at the top with the latest data.
@@ -233,6 +253,7 @@ buildCharts()
       window.graphData.svgLineChartTotal = svgLineChartTotal
     }
   })
+})
 
 // Update on move
 map.on('moveend', () => {
