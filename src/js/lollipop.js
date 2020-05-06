@@ -14,6 +14,11 @@ import {numberWithCommas} from "./utils.js"
 const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'reading') => {
   const chart = _createSVGContainer(height)
 
+  debugger;
+  data[0][yKey] = "Cases"
+  data[1][yKey] = "Deaths"
+  data[2][yKey] = "Recoveries"
+
   // Axes
   const x = _getXAxis(data, width)
   const y = _getYAxis(height, data.map(item => item[yKey]))
@@ -104,7 +109,7 @@ const _createSVGContainer = (height) => {
     .attr("width", "100%")
     .attr("height", height)
     .append("g")
-    .attr("transform", "translate(" + margin + ",0)")
+    .attr("transform", "translate(" + margin.lollipopChart + ",0)")
 }
 
 /**
@@ -118,7 +123,7 @@ const _getXAxis = (data, width) => {
     .domain([0, d3.max(data, function (d) {
       return d.value + 700000
     })])
-    .range([0, width - margin])
+    .range([0, width - margin.lollipopChart])
 }
 
 /**
@@ -128,8 +133,7 @@ const _getXAxis = (data, width) => {
  * @returns {*}
  */
 const _getYAxis = (height, categories) => d3.scaleBand()
-  .range([0, height - margin])
-  // .domain(data.map(function(d) { return d[selector]; }))
+  .range([0, height - margin.lollipopChart])
   .domain(categories)
   .padding(1)
 
@@ -142,13 +146,15 @@ const _getYAxis = (height, categories) => d3.scaleBand()
  */
 const _drawAxes = (chart, height, xAxisFunction, yAxisFunction) => {
   chart.append('g')
-    .attr('transform', 'translate(0, ' + (height - margin) + ')')
+    .attr('transform', 'translate(0, ' + (height - margin.lollipopChart) + ')')
     .call(d3.axisBottom(xAxisFunction))
     .selectAll('text')
     .attr('transform', 'translate(-10,10)rotate(-65)')
     .style('text-anchor', 'end')
+    .style('font-size', "12px")
   chart.append('g')
     .call(d3.axisLeft(yAxisFunction))
+    .style('font-size', "12px")
 }
 
 /**

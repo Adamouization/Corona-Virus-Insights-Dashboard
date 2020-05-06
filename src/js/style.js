@@ -20,7 +20,10 @@ const colourScheme = {
   secondary: "#858796",
 }
 
-const margin = 65
+const margin = {
+  lineChart: 65,
+  lollipopChart: 70,
+}
 
 export {
   mapBubbleStyle,

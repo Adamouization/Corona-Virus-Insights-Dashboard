@@ -38,7 +38,7 @@ const populateDailyEvolutionLineGraph = (domElement, height, width, labelSpacing
     _createD3Line(xScale, yScale, datesArr, dailyEvolutionDeaths)
   ]
 
-  return _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Confirmed cases", "Recoveries", "Deaths"], labelSpacing)
+  return _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Cases", "Recoveries", "Deaths"], labelSpacing)
 }
 
 /**
@@ -83,7 +83,7 @@ const populateTotalOccurrencesLineGraph = (domElement, height, width, labelSpaci
     _createD3Line(xScale, yScale, datesArr, totalDeaths)
   ]
 
-  return _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Total confirmed cases", "Total recoveries", "Total deaths"], labelSpacing)
+  return _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Total cases", "Total recoveries", "Total deaths"], labelSpacing)
 }
 
 /**
@@ -126,7 +126,7 @@ const _getXScale = (datesArr, width) => {
     .domain(datesArr.map(function (d) {
       return d
     }))
-    .range([0, width - margin])
+    .range([0, width - margin.lineChart])
 }
 
 /**
@@ -194,7 +194,7 @@ const _createSVGContainer = (domElement, height) => {
   return d3.select(domElement)
     .append("svg")
     .attr("width", "100%")
-    .attr("height", height + margin + "px")
+    .attr("height", height + margin.lineChart + "px")
 }
 
 /**
@@ -211,7 +211,7 @@ const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis, labelSpacing
   // Add the X axis to the svg. Only add a label every 8 days. Rotate labels to fit axis.
   lineGraphInstance.append("g")
     .attr("class", "x axis")
-    .attr("transform", "translate(" + margin + "," + height + ")")
+    .attr("transform", "translate(" + margin.lineChart + "," + height + ")")
     .call(xAxis
       .tickFormat(d3.timeFormat("%m/%d/%y"))
       .tickValues(xScale.domain()
@@ -228,7 +228,7 @@ const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis, labelSpacing
   // Add the Y axis to the svg.
   lineGraphInstance.append("g")
     .attr("class", "y axis")
-    .attr("transform", "translate(" + margin + ",0)")
+    .attr("transform", "translate(" + margin.lineChart + ",0)")
     .style('font-size', "12px")
     .call(yAxis)
     .append("text")
@@ -255,7 +255,7 @@ const _drawLines = (lineGraphInstance, datesArr, lines, colours) => {
       .datum(datesArr)
       .attr("class", "line")
       .attr("d", lines[i])
-      .attr("transform", "translate(" + margin + ",0)")  // translate by the same amount as the Y axis.
+      .attr("transform", "translate(" + margin.lineChart + ",0)")  // translate by the same amount as the Y axis.
       .style("stroke", colours[i])
   }
 }
