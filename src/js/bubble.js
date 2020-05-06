@@ -204,11 +204,14 @@ L.BubbleLayer = (L.Layer ? L.Layer : L.Class).extend({
         item.style = 'float:left; width: ' + radius + ';'
         div.appendChild(item)
       }
+      map.legend = legend
       return div
     }
-
-    // Add this one (only) for now, as the Population layer is on by default
+    if (this._map['legend']){
+      this._map['legend'].removeFrom(this._map)
+    }
     legend.addTo(this._map)
+    // Add this one (only) for now, as the Population layer is on by default
   },
 
   /**
