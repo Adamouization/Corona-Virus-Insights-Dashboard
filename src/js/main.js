@@ -6,6 +6,9 @@ import {createMap, removeMarkers} from './map.js'
 import {mapBubbleStyle} from './style.js'
 
 window.graphData = {}
+window.filters = {
+  country: ''
+}
 const lineChartDailyDivId = "line-graph-daily-evolution"
 const lineChartTotalDivId = "line-graph-total"
 const lollipopChartDivId = "case-breakdown"
@@ -127,7 +130,6 @@ const onBubble = e => {
   const {cases, recovered, deaths} = window.graphData
   applyCountryFilter(properties['Name'], cases, recovered, deaths)
   createFilterBreadCrumb(properties['Name'], e => {
-    console.log('test')
     buildCharts(window.graphData).then(() => {
     })
   })
@@ -181,17 +183,23 @@ const buildCharts = async (data, date=undefined) => {
   }
 }
 
+/**
+ * A function to asynchronously load the data
+ * @returns {Promise<{recovered: *, cases: *, latLongIso: *, currentDate, deaths: *}>}
+ */
 const loadData = async () => {
-  const latLongIso = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv')
-  const cases = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
-  const recovered = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv')
-  const deaths = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv')
-  const currentDate = Object.keys(getDatesFromTimeSeriesObject(cases[0])).sort((a, b) => new Date(b) - new Date(a))[0]
+  const dataSources = await Promise.all([
+    d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv'),
+    d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'),
+    d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv'),
+    d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv')
+  ])
+  const currentDate = Object.keys(getDatesFromTimeSeriesObject(dataSources[1])).sort((a, b) => new Date(b) - new Date(a))[0]
   return {
-    latLongIso,
-    cases,
-    recovered,
-    deaths,
+    latLongIso: dataSources[0],
+    cases: dataSources[1],
+    recovered: dataSources[2],
+    deaths: dataSources[3],
     currentDate,
   }
 }
