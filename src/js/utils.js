@@ -47,11 +47,27 @@ const getCasesOnDay = (cases, dateStr) => cases.map(country => Number(country[da
  */
 const buildDatesArr = (dates) => d3.timeDay.range(new Date(dates[0]), new Date(dates[dates.length - 1]))
 
+/**
+ * Returns the latest date.
+ * @param cases
+ * @returns {string}
+ */
+const getCurrentDate = (cases) => Object.keys(getDatesFromTimeSeriesObject(cases[0])).sort((a, b) => new Date(b) - new Date(a))[0]
+
+/**
+ * Prettify large numbers by adding commas. Converts an integer value to a String.
+ * @param number
+ * @returns {string}
+ */
+const numberWithCommas = (number) => number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+
 export {
   isDate,
   getDatesFromTimeSeriesObject,
   getByCountry,
   collapseByDate,
   getCasesOnDay,
-  buildDatesArr
+  buildDatesArr,
+  getCurrentDate,
+  numberWithCommas
 }

@@ -1,4 +1,4 @@
-import {getDatesFromTimeSeriesObject} from './utils.js'
+import {getCasesOnDay, getCurrentDate, getDatesFromTimeSeriesObject, numberWithCommas} from './utils.js'
 import {populateDailyEvolutionLineGraph, populateTotalOccurrencesLineGraph} from './line-graph.js'
 import {buildLollipopChart} from './lollipop.js'
 import {bubbleLayer} from './bubble.js'
@@ -121,7 +121,7 @@ const buildCharts = async () => {
   const cases = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
   const recovered = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv')
   const deaths = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv')
-  const currentDate = Object.keys(getDatesFromTimeSeriesObject(cases[0])).sort((a, b) => new Date(b) - new Date(a))[0]
+  const currentDate = getCurrentDate(cases)
   // await populateMap('#map', map, cases, currentDate)
   const geoJSON = standardiseGeoJson(getGeoJsonFromCases(cases, recovered, deaths, latLongIso, currentDate))
   removeMarkers(map, 'bubblelayer')
@@ -155,6 +155,10 @@ buildCharts().then((data) => {
       map.panTo(new L.LatLng(countriesFiltered[0]['Lat'], countriesFiltered[0]['Long_']), {animate: true, duration: 0.75})
     }
   })
+
+  // Populate the 4 cards at the top with the latest data.
+  populateCards(data)
+
 })
 
 // Update on move
@@ -163,3 +167,17 @@ map.on('moveend', () => {
     .attr('cx', d => map.latLngToLayerPoint([d['Lat'], d['Long']]).x)
     .attr('cy', d => map.latLngToLayerPoint([d['Lat'], d['Long']]).y)
 })
+
+/**
+ * Populates the 4 cards at the top of the dashboard.
+ */
+function populateCards(data) {
+  const dates = Object.keys(getDatesFromTimeSeriesObject(data.cases[0]))
+  const currentDate = dates[dates.length - 1]
+  const previousDate = dates[dates.length - 2]
+
+  // Update the cards
+  document.getElementById('card-date').innerHTML = currentDate
+  document.getElementById('card-total-confirmed-cases').innerHTML = numberWithCommas(getCasesOnDay(data.cases, currentDate))
+  document.getElementById('card-confirmed-cases-today').innerHTML = numberWithCommas(Math.abs(getCasesOnDay(data.cases, currentDate) - getCasesOnDay(data.cases, previousDate)))
+}
