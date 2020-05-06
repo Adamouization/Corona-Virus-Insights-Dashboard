@@ -11,12 +11,20 @@ window.filters = {
   date: undefined
 }
 
+const headers = {
+  'daily-evolution-header': 'Daily Evolution',
+  'global-breakdown': 'Global Breakdown',
+  'total-occurrences': 'Total Occurrences'
+}
+
+const changeHeader = (country, header) => `${headers[header]} in ${country}`
+
 const filterProxy = new Proxy(window.filters, {
   set: (obj, prop, value) => {
     obj[prop] = value
     const noFiltersApplied = Object.values(obj).every(x => (x === undefined || x === ''))
-    const filterDomCard = document.getElementById('filter-card').classList
-    noFiltersApplied ? filterDomCard.add('d-none') : filterDomCard.remove('d-none')
+    const filterDomCard = document.getElementById('no-filter-msg').classList
+    noFiltersApplied ? filterDomCard.remove('d-none') : filterDomCard.add('d-none')
     return true
   }
 })
@@ -27,7 +35,7 @@ const lineChartTotalDivId = "line-graph-total"
 const lollipopChartDivId = "case-breakdown"
 
 const mapboxAccessToken = 'pk.eyJ1IjoibWF0dGRyYWdvOTgiLCJhIjoiY2s4MWhia2l0MDUyZTNmb2Rqa2x1YjV0NiJ9.XmI1DncVRdyUOl_yhifSJQ'
-const map = createMap(mapboxAccessToken).setView([47, 2], 5)
+const map = createMap(mapboxAccessToken).setView([47, 2], 3)
 
 /**
  * A function to construct a mapping to a geojson object from the case timeseries
@@ -111,7 +119,9 @@ const applyCountryFilter = (name, cases, recovered, deaths) => {
   const filteredCases = cases.filter(filter)
   const filteredRecoveries = recovered.filter(filter)
   const filteredDeaths = deaths.filter(filter)
-
+  Object.keys(headers).forEach((id) => {
+    document.getElementById(id).innerText = changeHeader(name, id)
+  })
   // Redraw charts.
   buildLollipopChart(lollipopChartDivId, 212, document.getElementById(lollipopChartDivId).offsetWidth - 35, getCaseDetails(filteredCases, filteredRecoveries, filteredDeaths, getCurrentDate(cases)))
   populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 210, document.getElementById(lineChartDailyDivId).offsetWidth, 8, filteredCases, filteredRecoveries, filteredDeaths, getDates(cases))
@@ -148,6 +158,9 @@ const onBubble = e => {
   createFilterBreadCrumb(properties['Name'], e => {
     filterProxy.country = undefined
     e.currentTarget.parentNode.parentNode.remove()
+    Object.entries(headers).forEach(([id, value]) => {
+      document.getElementById(id).innerText = value
+    })
     buildCharts(window.graphData).then(() => {
     })
   })

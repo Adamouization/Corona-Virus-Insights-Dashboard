@@ -7,7 +7,7 @@ import {collapseByDate, getByCountry} from './utils.js'
  */
 const createMap = mapboxAccessToken => {
   const map = L.map('map', {
-    minZoom: 0,
+    minZoom: 2,
     maxZoom: 4
   })
 
