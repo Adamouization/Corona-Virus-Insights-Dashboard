@@ -47,12 +47,13 @@ const getGeoJsonFromCases = (cases, recoveries, deaths, isoPopulation, date) => 
  */
 const standardiseGeoJson = geoJson => ({
   type: "FeatureCollection",
-  features: geoJson.features.map(feature => ({...feature,
+  features: geoJson.features.map(feature => ({
+    ...feature,
     properties: {
-    ...feature.properties,
+      ...feature.properties,
       'Infections per 1000': feature.properties.cases / feature.properties.population * 1000,
       'Mortality Rate': feature.properties.deaths / feature.properties.cases
-  }
+    }
   }))
 })
 
@@ -106,7 +107,7 @@ const applyCountryFilter = (name, cases, recovered, deaths) => {
  * @param onclick
  * @param filterParent
  */
-const createFilterBreadCrumb = (name, onclick, filterParent='filter-container') => {
+const createFilterBreadCrumb = (name, onclick, filterParent = 'filter-container') => {
   const template = document.createElement('div')
   template.innerHTML = `<button class="btn btn-secondary">
                             <span class="txt">${name}</span>
@@ -121,13 +122,28 @@ const createFilterBreadCrumb = (name, onclick, filterParent='filter-container') 
  * @param e
  */
 const onBubble = e => {
-  const { properties } = e.sourceTarget.feature
+  const {properties} = e.sourceTarget.feature
   const {cases, recovered, deaths} = window.graphData
   applyCountryFilter(properties['Name'], cases, recovered, deaths)
   createFilterBreadCrumb(properties['Name'], e => {
     console.log('test')
-    buildCharts().then(() => {})
+    buildCharts().then(() => {
+    })
   })
+}
+
+/**
+ * Populates the 4 cards at the top of the dashboard.
+ * @param data
+ */
+function populateCards(data) {
+  const currentDate = data.dates[data.dates.length - 1]
+  const previousDate = data.dates[data.dates.length - 2]
+
+  // Update the cards
+  document.getElementById('card-date').innerHTML = currentDate
+  document.getElementById('card-total-confirmed-cases').innerHTML = numberWithCommas(getCasesOnDay(data.cases, currentDate))
+  document.getElementById('card-confirmed-cases-today').innerHTML = numberWithCommas(Math.abs(getCasesOnDay(data.cases, currentDate) - getCasesOnDay(data.cases, previousDate)))
 }
 
 /**
@@ -143,61 +159,67 @@ const buildCharts = async () => {
   // await populateMap('#map', map, cases, currentDate)
   const geoJSON = standardiseGeoJson(getGeoJsonFromCases(cases, recovered, deaths, latLongIso, currentDate))
   removeMarkers(map, 'bubblelayer')
-  bubbleLayer(geoJSON, { property: 'cases', onBubbleClick: onBubble, legend: true, tooltip: true, style: mapBubbleStyle()}).addTo(map)
+  bubbleLayer(geoJSON, {
+    property: 'cases',
+    onBubbleClick: onBubble,
+    legend: true,
+    tooltip: true,
+    style: mapBubbleStyle()
+  }).addTo(map)
 
   // Lollipop chart
-  const lollipopChartDivId  = "case-breakdown"
+  const lollipopChartDivId = "case-breakdown"
   buildLollipopChart(lollipopChartDivId, 212, document.getElementById(lollipopChartDivId).offsetWidth - 15, getCaseDetails(cases, recovered, deaths, currentDate))
 
   // Line charts
   const dates = Object.keys(getDatesFromTimeSeriesObject(cases[0]))
-  const lineChartDailyDivId  = "line-graph-daily-evolution"
-  const lineChartTotalDivId  = "line-graph-total"
+  const lineChartDailyDivId = "line-graph-daily-evolution"
+  const lineChartTotalDivId = "line-graph-total"
   populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 210, document.getElementById(lineChartDailyDivId).offsetWidth, 8, cases, recovered, deaths, dates)
   populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, cases, recovered, deaths, dates)
+
   return {
     latLongIso,
     cases,
     recovered,
-    deaths
+    deaths,
+    dates
   }
 }
 
-/**
- * Populates the 4 cards at the top of the dashboard.
- */
-function populateCards(data) {
-  const dates = Object.keys(getDatesFromTimeSeriesObject(data.cases[0]))
-  const currentDate = dates[dates.length - 1]
-  const previousDate = dates[dates.length - 2]
-
-  // Update the cards
-  document.getElementById('card-date').innerHTML = currentDate
-  document.getElementById('card-total-confirmed-cases').innerHTML = numberWithCommas(getCasesOnDay(data.cases, currentDate))
-  document.getElementById('card-confirmed-cases-today').innerHTML = numberWithCommas(Math.abs(getCasesOnDay(data.cases, currentDate) - getCasesOnDay(data.cases, previousDate)))
-}
-
 // Build the charts
-buildCharts().then((data) => {
-  window.graphData = data
-  document.getElementById('search-button').addEventListener('click', e => {
-    const query = document.getElementById('search-query').value.toLowerCase()
-    const { latLongIso } = data
-    const countriesFiltered = latLongIso
-      .filter(country => country['Country_Region'].toLowerCase() === query
-        || country['Province_State'].toLowerCase() === query)
-    if (countriesFiltered.length === 0 || query === '') {
-      document.getElementById('search-query').classList.add('is-invalid')
-      document.getElementById('validation-msg').innerHTML = 'That country or state does not exist.'
-    } else {
-      document.getElementById('search-query').classList.remove('is-invalid')
-      map.panTo(new L.LatLng(countriesFiltered[0]['Lat'], countriesFiltered[0]['Long_']), {animate: true, duration: 0.75})
+buildCharts()
+  // then add functionality to the search bar, populate the cards and add dynamic resizing
+  .then((data) => {
+    window.graphData = data
+
+    // Populate the 4 cards at the top with the latest data.
+    populateCards(data)
+
+    // Search bar
+    document.getElementById('search-button').addEventListener('click', e => {
+      const query = document.getElementById('search-query').value.toLowerCase()
+      const {latLongIso} = data
+      const countriesFiltered = latLongIso
+        .filter(country => country['Country_Region'].toLowerCase() === query
+          || country['Province_State'].toLowerCase() === query)
+      if (countriesFiltered.length === 0 || query === '') {
+        document.getElementById('search-query').classList.add('is-invalid')
+        document.getElementById('validation-msg').innerHTML = 'That country or state does not exist.'
+      } else {
+        document.getElementById('search-query').classList.remove('is-invalid')
+        map.panTo(new L.LatLng(countriesFiltered[0]['Lat'], countriesFiltered[0]['Long_']), {
+          animate: true,
+          duration: 0.75
+        })
+      }
+    })
+
+    // Update chart sizes on window resize.
+    window.onresize = function (event) {
+      // todo redraw charts
     }
   })
-
-  // Populate the 4 cards at the top with the latest data.
-  populateCards(data)
-})
 
 // Update on move
 map.on('moveend', () => {
