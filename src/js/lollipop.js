@@ -14,7 +14,6 @@ import {numberWithCommas} from "./utils.js"
 const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'reading') => {
   const chart = _createSVGContainer(height)
 
-  debugger;
   data[0][yKey] = "Cases"
   data[1][yKey] = "Deaths"
   data[2][yKey] = "Recoveries"

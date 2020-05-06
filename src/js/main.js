@@ -54,8 +54,8 @@ const standardiseGeoJson = geoJson => ({
     ...feature,
     properties: {
       ...feature.properties,
-      'Infections per 1000': feature.properties.cases / feature.properties.population * 1000,
-      'Mortality Rate': feature.properties.deaths / feature.properties.cases
+      'Infections per 1000': (feature.properties.cases / feature.properties.population * 1000).toPrecision(3) + "‰",
+      'Mortality Rate': (feature.properties.deaths / feature.properties.cases * 100).toPrecision(3) + "%"
     }
   }))
 })
