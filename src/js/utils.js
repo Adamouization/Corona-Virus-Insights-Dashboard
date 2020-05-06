@@ -61,6 +61,13 @@ const getCurrentDate = (cases) => Object.keys(getDatesFromTimeSeriesObject(cases
  */
 const numberWithCommas = (number) => number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 
+/**
+ * Return list of dates.
+ * @param cases
+ * @returns {string[]}
+ */
+const getDates = (cases) => Object.keys(getDatesFromTimeSeriesObject(cases[0]))
+
 export {
   isDate,
   getDatesFromTimeSeriesObject,
@@ -69,5 +76,6 @@ export {
   getCasesOnDay,
   buildDatesArr,
   getCurrentDate,
-  numberWithCommas
+  numberWithCommas,
+  getDates
 }
