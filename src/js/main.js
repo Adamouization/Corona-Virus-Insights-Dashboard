@@ -151,13 +151,10 @@ function populateCards(data) {
  * An function to build the charts
  * @returns {Promise<object>}
  */
-const buildCharts = async () => {
-  const latLongIso = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv')
-  const cases = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
-  const recovered = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv')
-  const deaths = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv')
-  const currentDate = getCurrentDate(cases)
-  // await populateMap('#map', map, cases, currentDate)
+
+const buildCharts = async (data, date=undefined) => {
+  const { latLongIso, cases, recovered, deaths } = data
+  const currentDate = date || getCurrentDate(cases)
   const geoJSON = standardiseGeoJson(getGeoJsonFromCases(cases, recovered, deaths, latLongIso, currentDate))
   removeMarkers(map, 'bubblelayer')
   bubbleLayer(geoJSON, {
@@ -172,7 +169,6 @@ const buildCharts = async () => {
   const lollipopChart = buildLollipopChart(lollipopChartDivId, 212, document.getElementById(lollipopChartDivId).offsetWidth - 15, getCaseDetails(cases, recovered, deaths, currentDate))
   const svgLineChartDaily = populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 210, document.getElementById(lineChartDailyDivId).offsetWidth, 8, cases, recovered, deaths, getDates(cases))
   const svgLineChartTotal = populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, cases, recovered, deaths, getDates(cases))
-
   return {
     latLongIso,
     cases,
@@ -180,14 +176,29 @@ const buildCharts = async () => {
     deaths,
     svgLineChartDaily,
     svgLineChartTotal,
-    lollipopChart
+    lollipopChart,
+    currentDate,
   }
 }
 
-// Build the charts
-buildCharts()
-  // then add functionality to the search bar, populate the cards and add dynamic resizing
-  .then((data) => {
+const loadData = async () => {
+  const latLongIso = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv')
+  const cases = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
+  const recovered = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv')
+  const deaths = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv')
+  const currentDate = Object.keys(getDatesFromTimeSeriesObject(cases[0])).sort((a, b) => new Date(b) - new Date(a))[0]
+  return {
+    latLongIso,
+    cases,
+    recovered,
+    deaths,
+    currentDate,
+  }
+}
+
+loadData().then(data => {
+  window.graphData = data
+  buildCharts(window.graphData).then((data) => {
     window.graphData = data
 
     // Populate the 4 cards at the top with the latest data.
@@ -233,6 +244,7 @@ buildCharts()
       window.graphData.svgLineChartTotal = svgLineChartTotal
     }
   })
+})
 
 // Update on move
 map.on('moveend', () => {
