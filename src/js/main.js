@@ -1,5 +1,5 @@
 import {getCasesOnDay, getCurrentDate, getDatesFromTimeSeriesObject, numberWithCommas} from './utils.js'
-import {populateDailyEvolutionLineGraph, populateTotalOccurrencesLineGraph} from './line-graph.js'
+import {deleteLines, populateDailyEvolutionLineGraph, populateTotalOccurrencesLineGraph} from './line-graph.js'
 import {buildLollipopChart} from './lollipop.js'
 import {bubbleLayer} from './bubble.js'
 import {createMap, removeMarkers} from './map.js'
@@ -175,15 +175,17 @@ const buildCharts = async () => {
   const dates = Object.keys(getDatesFromTimeSeriesObject(cases[0]))
   const lineChartDailyDivId = "line-graph-daily-evolution"
   const lineChartTotalDivId = "line-graph-total"
-  populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 210, document.getElementById(lineChartDailyDivId).offsetWidth, 8, cases, recovered, deaths, dates)
-  populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, cases, recovered, deaths, dates)
+  const svgLineChartDaily = populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 210, document.getElementById(lineChartDailyDivId).offsetWidth, 8, cases, recovered, deaths, dates)
+  const svgLineChartTotal = populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, cases, recovered, deaths, dates)
 
   return {
     latLongIso,
     cases,
     recovered,
     deaths,
-    dates
+    dates,
+    svgLineChartDaily,
+    svgLineChartTotal
   }
 }
 
@@ -217,7 +219,19 @@ buildCharts()
 
     // Update chart sizes on window resize.
     window.onresize = function (event) {
-      // todo redraw charts
+      // Erase existing lines
+      deleteLines(window.graphData.svgLineChartDaily)
+      deleteLines(window.graphData.svgLineChartTotal)
+
+      // Redraw charts
+      const lineChartDailyDivId = "line-graph-daily-evolution"
+      const lineChartTotalDivId = "line-graph-total"
+      const svgLineChartDaily = populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 210, document.getElementById(lineChartDailyDivId).offsetWidth, 8, window.graphData.cases, window.graphData.recovered, window.graphData.deaths, window.graphData.dates)
+      const svgLineChartTotal = populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, window.graphData.cases, window.graphData.recovered, window.graphData.deaths, window.graphData.dates)
+
+      // Save the new SVG charts for future resizing
+      window.graphData.svgLineChartDaily = svgLineChartDaily
+      window.graphData.svgLineChartTotal = svgLineChartTotal
     }
   })
 
