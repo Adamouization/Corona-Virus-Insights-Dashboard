@@ -7,8 +7,21 @@ import {mapBubbleStyle} from './style.js'
 
 window.graphData = {}
 window.filters = {
-  country: ''
+  country: undefined,
+  date: undefined
 }
+
+const filterProxy = new Proxy(window.filters, {
+  set: (obj, prop, value) => {
+    obj[prop] = value
+    const noFiltersApplied = Object.values(obj).every(x => (x === undefined || x === ''))
+    const filterDomCard = document.getElementById('filter-card').classList
+    noFiltersApplied ? filterDomCard.add('d-none') : filterDomCard.remove('d-none')
+    return true
+  }
+})
+
+
 const lineChartDailyDivId = "line-graph-daily-evolution"
 const lineChartTotalDivId = "line-graph-total"
 const lollipopChartDivId = "case-breakdown"
@@ -131,7 +144,9 @@ const onBubble = e => {
   const {cases, recovered, deaths} = window.graphData
   applyCountryFilter(properties['Name'], cases, recovered, deaths)
   document.querySelectorAll('button.country-filter-crumb').forEach(crumb => crumb.remove())
+  filterProxy.country = properties['Name']
   createFilterBreadCrumb(properties['Name'], e => {
+    filterProxy.country = undefined
     e.currentTarget.parentNode.parentNode.remove()
     buildCharts(window.graphData).then(() => {
     })
