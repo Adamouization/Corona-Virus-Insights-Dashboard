@@ -1,3 +1,7 @@
+/**
+ * A map op
+ * @returns {{fillColor: string, color: string, fillOpacity: number, weight: number, radius: number, opacity: number}}
+ */
 const mapBubbleStyle = () => ({
   radius: 10,
   fillColor: "#deab19",
