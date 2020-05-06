@@ -56,9 +56,11 @@
 
                     <!-- Topbar Search -->
                     <div class="pull-right">
-                        <form onsubmit="" class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <form onsubmit=""
+                              class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                             <div class="input-group">
-                                <input type="text" class="form-control bg-light border-0 small" id="search-query" placeholder="Search for..."
+                                <input type="text" class="form-control bg-light border-0 small" id="search-query"
+                                       placeholder="Filter by country..."
                                        aria-label="Search" aria-describedby="basic-addon2">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="button" id="search-button">
@@ -104,7 +106,8 @@
                                         <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
                                             Total confirmed cases
                                         </div>
-                                        <div id="card-total-confirmed-cases" class="h5 mb-0 font-weight-bold text-gray-800"></div>
+                                        <div id="card-total-confirmed-cases"
+                                             class="h5 mb-0 font-weight-bold text-gray-800"></div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-temperature-high fa-2x text-gray-300"></i>
@@ -123,7 +126,8 @@
                                         <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                             Confirmed cases today
                                         </div>
-                                        <div id="card-confirmed-cases-today" class="h5 mb-0 font-weight-bold text-gray-800"></div>
+                                        <div id="card-confirmed-cases-today"
+                                             class="h5 mb-0 font-weight-bold text-gray-800"></div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-hospital fa-2x text-gray-300"></i>
@@ -166,6 +170,7 @@
                 </div>
                 <!-- End of Row -->
 
+                <!-- Content Row -->
                 <div class="row" id="filter-card">
                     <div class="col-xl-12 col-lg-12">
                         <div class="card shadow mb-4">
@@ -174,12 +179,11 @@
                                 <h6 class="m-0 font-weight-bold text-primary">Filters</h6>
                             </div>
                             <!-- Card Body -->
-                            <div class="card-body" id="filter-container">
-
-                            </div>
+                            <div class="card-body" id="filter-container"></div>
                         </div>
                     </div>
                 </div>
+                <!-- End of Row -->
 
                 <!-- Content Row -->
                 <div class="row">
@@ -211,18 +215,6 @@
                             <!-- Card Body -->
                             <div class="card-body">
                                 <div id="line-graph-daily-evolution"></div>
-                                <!-- Uncomment for legend in  card -->
-                                <!--                                <div class="mt-4 text-center small">-->
-                                <!--                                    <span class="mr-2">-->
-                                <!--                                      <i class="fas fa-circle text-primary"></i> Direct-->
-                                <!--                                    </span>-->
-                                <!--                                                    <span class="mr-2">-->
-                                <!--                                      <i class="fas fa-circle text-success"></i> Social-->
-                                <!--                                    </span>-->
-                                <!--                                                    <span class="mr-2">-->
-                                <!--                                      <i class="fas fa-circle text-info"></i> Referral-->
-                                <!--                                    </span>-->
-                                <!--                                </div>-->
                             </div>
                         </div>
 

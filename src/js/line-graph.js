@@ -38,7 +38,7 @@ const populateDailyEvolutionLineGraph = (domElement, height, width, labelSpacing
     _createD3Line(xScale, yScale, datesArr, dailyEvolutionDeaths)
   ]
 
-  _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Confirmed cases", "Recoveries", "Deaths"], labelSpacing)
+  return _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Confirmed cases", "Recoveries", "Deaths"], labelSpacing)
 }
 
 /**
@@ -54,6 +54,11 @@ const populateDailyEvolutionLineGraph = (domElement, height, width, labelSpacing
  */
 const populateTotalOccurrencesLineGraph = (domElement, height, width, labelSpacing, cases, recovered, deaths, dates) => {
   d3.select(domElement).select('svg').remove()
+
+  // Reduce number of labels on small screens.
+  if (width <= 800) {
+    labelSpacing = 8
+  }
 
   // Calculate the number of new confirmed cases on a daily basis.
   const totalCases = _parseTotalDailyCases(cases, dates)
@@ -78,7 +83,7 @@ const populateTotalOccurrencesLineGraph = (domElement, height, width, labelSpaci
     _createD3Line(xScale, yScale, datesArr, totalDeaths)
   ]
 
-  _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Total confirmed cases", "Total recoveries", "Total deaths"], labelSpacing)
+  return _drawChart(domElement, height, xAxis, xScale, yAxis, datesArr, lines, ["Total confirmed cases", "Total recoveries", "Total deaths"], labelSpacing)
 }
 
 /**
@@ -174,6 +179,7 @@ const _drawChart = (domElement, height, xAxis, xScale, yAxis, datesArr, lines, l
   _drawAxes(lineGraphInstance, height, xAxis, xScale, yAxis, labelSpacing)
   _drawLines(lineGraphInstance, datesArr, lines, colours)
   _drawLegend(lineGraphInstance, colours, legendLabels)
+  return lineGraphInstance
 }
 
 /**
@@ -279,7 +285,16 @@ const _drawLegend = (lineGraphInstance, colours, legendLabels) => {
   }
 }
 
+/**
+ * Delete paths in a line chart.
+ * @param svgElement
+ */
+const deleteLineChart = (svgElement) => {
+  svgElement.selectAll("path").remove()
+}
+
 export {
   populateDailyEvolutionLineGraph,
-  populateTotalOccurrencesLineGraph
+  populateTotalOccurrencesLineGraph,
+  deleteLineChart
 }

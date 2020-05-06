@@ -1,5 +1,15 @@
 import {colourScheme, margin} from "./style.js"
 
+/**
+ *
+ * @param name
+ * @param height
+ * @param width
+ * @param data
+ * @param xKey
+ * @param yKey
+ * @returns {jQuery}
+ */
 const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'reading') => {
   const chart = _createSVGContainer(height)
 
@@ -38,6 +48,8 @@ const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'r
     .transition()
     .duration(2000)
     .attr('x1', d => x(d[xKey]))
+
+  return chart
 }
 
 /**
@@ -100,6 +112,16 @@ const _drawAxes = (chart, height, xAxisFunction, yAxisFunction) => {
     .call(d3.axisLeft(yAxisFunction))
 }
 
+/**
+ * Delete lines and circles in the lollipop chart.
+ * @param svgElement
+ */
+const deleteLollipopChart = (svgElement) => {
+  svgElement.selectAll("line").remove()
+  svgElement.selectAll("circle").remove()
+}
+
 export {
-  buildLollipopChart
+  buildLollipopChart,
+  deleteLollipopChart
 }
