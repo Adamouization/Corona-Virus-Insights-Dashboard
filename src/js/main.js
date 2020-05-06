@@ -106,14 +106,15 @@ const applyCountryFilter = (name, cases, recovered, deaths) => {
 }
 
 /**
- *
- * @param name
- * @param onclick
- * @param filterParent
+ * A function to create the breadcrumbs for the country filter
+ * @param name the country name
+ * @param onclick the on click function
+ * @param crumb_class the crumb class
+ * @param filterParent the filter parent document
  */
-const createFilterBreadCrumb = (name, onclick, filterParent = 'filter-container') => {
+const createFilterBreadCrumb = (name, onclick, crumb_class='country-filter-crumb', filterParent = 'filter-container') => {
   const template = document.createElement('div')
-  template.innerHTML = `<button class="btn btn-secondary">
+  template.innerHTML = `<button class="btn btn-secondary ${crumb_class}">
                             <span class="txt">${name}</span>
                             <span class="round"><i class="fas text-gray-300 fa-times"></i></span>
                         </button>`
@@ -129,6 +130,7 @@ const onBubble = e => {
   const {properties} = e.sourceTarget.feature
   const {cases, recovered, deaths} = window.graphData
   applyCountryFilter(properties['Name'], cases, recovered, deaths)
+  document.querySelectorAll('button.country-filter-crumb').forEach(crumb => crumb.remove())
   createFilterBreadCrumb(properties['Name'], e => {
     e.currentTarget.parentNode.parentNode.remove()
     buildCharts(window.graphData).then(() => {
@@ -154,7 +156,6 @@ function populateCards(data) {
  * An function to build the charts
  * @returns {Promise<object>}
  */
-
 const buildCharts = async (data, date = undefined) => {
   const {latLongIso, cases, recovered, deaths} = data
   const currentDate = date || getCurrentDate(cases)
