@@ -1,4 +1,5 @@
 import {colourScheme, margin} from "./style.js"
+import {numberWithCommas} from "./utils.js"
 
 /**
  *
@@ -12,6 +13,10 @@ import {colourScheme, margin} from "./style.js"
  */
 const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'reading') => {
   const chart = _createSVGContainer(height)
+
+  data[0][yKey] = "Cases"
+  data[1][yKey] = "Deaths"
+  data[2][yKey] = "Recoveries"
 
   // Axes
   const x = _getXAxis(data, width)
@@ -28,6 +33,30 @@ const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'r
     .attr('y1', d => y(d[yKey]))
     .attr('y2', d => y(d[yKey]))
     .attr('stroke', 'grey')
+    .attr('stroke-width', 2)
+
+  // Labels
+  chart.selectAll(`text${name}lollipop`)
+    .data(data)
+    .enter()
+    .append('text')
+    .attr('x', (d, i) => {
+      if (i === 1) {
+        return x(d[xKey]) + 10
+      } else {
+        return x(d[xKey]) + 35
+      }
+    })
+    .attr('y', (d, i) => {
+      if (i === 0) {
+        return y(d[yKey]) + ((x(d[xKey]) * 0.06) / 4)
+      } else {
+        return y(d[yKey]) + ((x(d[xKey]) * 0.1) / 4)
+      }
+    })
+    .attr('fill', "black")
+    .text(d => numberWithCommas(d[xKey]))
+    .style('font-size', "12px")
 
   // Circles
   chart.selectAll(`circle${name}lollipop`)
@@ -36,9 +65,23 @@ const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'r
     .append('circle')
     .attr('cx', (d) => x(d[xKey]))
     .attr('cy', (d) => y(d[yKey]))
-    .attr('r', '4')
-    .style('fill', colourScheme.primary)
-    .attr('stroke', 'black')
+    .attr('r', (d, i) => {
+      if (i === 0) {
+        return x(d[xKey]) * 0.07
+      } else {
+        return x(d[xKey]) * 0.15
+      }
+    })
+    .style('fill', (d, i) => {
+      if (i === 0) {
+        return colourScheme.warning
+      } else if (i === 1) {
+        return colourScheme.danger
+      } else {
+        return colourScheme.success
+      }
+    })
+    .attr('stroke', colourScheme.secondary)
   chart.selectAll(`circle${name}lollipop`)
     .transition()
     .duration(2000)
@@ -65,7 +108,7 @@ const _createSVGContainer = (height) => {
     .attr("width", "100%")
     .attr("height", height)
     .append("g")
-    .attr("transform", "translate(" + margin + ",0)")
+    .attr("transform", "translate(" + margin.lollipopChart + ",0)")
 }
 
 /**
@@ -77,9 +120,9 @@ const _createSVGContainer = (height) => {
 const _getXAxis = (data, width) => {
   return d3.scaleLinear()
     .domain([0, d3.max(data, function (d) {
-      return d.value
+      return d.value + 700000
     })])
-    .range([0, width - margin])
+    .range([0, width - margin.lollipopChart])
 }
 
 /**
@@ -89,8 +132,7 @@ const _getXAxis = (data, width) => {
  * @returns {*}
  */
 const _getYAxis = (height, categories) => d3.scaleBand()
-  .range([0, height - margin])
-  // .domain(data.map(function(d) { return d[selector]; }))
+  .range([0, height - margin.lollipopChart])
   .domain(categories)
   .padding(1)
 
@@ -103,13 +145,15 @@ const _getYAxis = (height, categories) => d3.scaleBand()
  */
 const _drawAxes = (chart, height, xAxisFunction, yAxisFunction) => {
   chart.append('g')
-    .attr('transform', 'translate(0, ' + (height - margin) + ')')
+    .attr('transform', 'translate(0, ' + (height - margin.lollipopChart) + ')')
     .call(d3.axisBottom(xAxisFunction))
     .selectAll('text')
     .attr('transform', 'translate(-10,10)rotate(-65)')
     .style('text-anchor', 'end')
+    .style('font-size', "12px")
   chart.append('g')
     .call(d3.axisLeft(yAxisFunction))
+    .style('font-size', "12px")
 }
 
 /**
