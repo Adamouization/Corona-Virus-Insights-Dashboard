@@ -41,10 +41,12 @@ const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'r
     .enter()
     .append('text')
     .attr('x', (d, i) => {
-      if (i === 1) {
-        return x(d[xKey]) + 10
-      } else {
-        return x(d[xKey]) + 35
+      if (i === 0) {
+        return x(d[xKey]) + 45
+      } else if (i === 1) {
+        return x(d[xKey]) + 15
+      } else if (i === 2) {
+        return x(d[xKey]) + 40
       }
     })
     .attr('y', (d, i) => {

@@ -52,7 +52,12 @@
 
                 <!-- Page Heading -->
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                    <h1 class="h3 mb-0 text-gray-800">Coronavirus Insights</h1>
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800" style="float:left;">Coronavirus Insights</h1>
+                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#myModal" style="margin-left: 10px">
+                            <i class="fas fa-info-circle fa-sm"></i>
+                        </button>
+                    </div>
 
                     <!-- Topbar Search -->
                     <div class="pull-right">
@@ -172,7 +177,6 @@
 
                 </div>
                 <!-- End of Row -->
-                <!-- End of Row -->
 
                 <!-- Content Row -->
                 <div class="row">
@@ -261,6 +265,30 @@
 
 </div>
 <!-- End of Page Wrapper -->
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Coronavirus Insights: a COVID-19 Dashboard</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Welcome to this interactive web-based dashboard for tracking the spread of COVID-19 across the world.
+                    The data, provided by John Hopkins CSSE, is updated on a daily basis.</p>
+                <p>Feel free to filter the visualisations by country through the search bar or through the map (by
+                    clicking on a specific country).</p>
+                <p>Data source: <a href="https://systems.jhu.edu/research/public-health/ncov/">JHU CSSE</a>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end Modal -->
 
 <!-- Third-party JS libraries import -->
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"
