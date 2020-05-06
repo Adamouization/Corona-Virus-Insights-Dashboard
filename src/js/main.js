@@ -141,7 +141,7 @@ const onBubble = e => {
  * @param data
  */
 function populateCards(data) {
-  const currentDate =  getDates(data.cases)[getDates(data.cases).length - 1]
+  const currentDate = getDates(data.cases)[getDates(data.cases).length - 1]
   const previousDate = getDates(data.cases)[getDates(data.cases).length - 2]
 
   // Update the cards
@@ -155,8 +155,8 @@ function populateCards(data) {
  * @returns {Promise<object>}
  */
 
-const buildCharts = async (data, date=undefined) => {
-  const { latLongIso, cases, recovered, deaths } = data
+const buildCharts = async (data, date = undefined) => {
+  const {latLongIso, cases, recovered, deaths} = data
   const currentDate = date || getCurrentDate(cases)
   const geoJSON = standardiseGeoJson(getGeoJsonFromCases(cases, recovered, deaths, latLongIso, currentDate))
   removeMarkers(map, 'bubblelayer')
