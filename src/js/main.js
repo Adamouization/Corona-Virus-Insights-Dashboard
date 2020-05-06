@@ -1,4 +1,4 @@
-import {getCurrentDate, getDatesFromTimeSeriesObject} from './utils.js'
+import {getCasesOnDay, getCurrentDate, getDatesFromTimeSeriesObject, numberWithCommas} from './utils.js'
 import {populateDailyEvolutionLineGraph, populateTotalOccurrencesLineGraph} from './line-graph.js'
 import {buildLollipopChart} from './lollipop.js'
 import {bubbleLayer} from './bubble.js'
@@ -157,7 +157,10 @@ buildCharts().then((data) => {
   })
 
   // Update Dates card
-  document.getElementById('card-date').innerHTML = getCurrentDate(data.cases)
+  const currentDate = getCurrentDate(data.cases)
+  document.getElementById('card-date').innerHTML = currentDate
+  // Update total confirmed cases card
+  document.getElementById('card-total-confirmed-cases').innerHTML = numberWithCommas(getCasesOnDay(data.cases, currentDate))
 })
 
 // Update on move
