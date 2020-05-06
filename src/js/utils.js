@@ -38,7 +38,7 @@ const collapseByDate = (object, date) => object.map(item => item[date]).reduce((
  * @param dateStr
  * @returns {bigint}
  */
-const getCasesOnDay = (cases, dateStr) => cases.map(country => Number(country[dateStr])).reduce((prev, next) => prev + next)
+const getCasesOnDay = (cases, dateStr) => cases.map(country => Number(country[dateStr])).reduce((prev, next) => prev + next, 0)
 
 /**
  * Returns a sorted Array with all the dates found in the data.

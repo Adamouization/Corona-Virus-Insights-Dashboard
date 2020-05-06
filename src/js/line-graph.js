@@ -13,9 +13,7 @@ import {colourScheme, margin} from "./style.js"
  * @param dates
  */
 const populateDailyEvolutionLineGraph = (domElement, height, width, labelSpacing, cases, recovered, deaths, dates) => {
-  // Reverse dates to have them in chronological order.
-  dates.reverse()
-
+  d3.select(domElement).select('svg').remove()
   // Calculate the number of new confirmed cases on a daily basis.
   const dailyEvolutionCases = _parseDailyEvolution(_parseTotalDailyCases(cases, dates))
   const dailyEvolutionRecoveries = _parseDailyEvolution(_parseTotalDailyCases(recovered, dates))
@@ -55,7 +53,7 @@ const populateDailyEvolutionLineGraph = (domElement, height, width, labelSpacing
  * @param dates
  */
 const populateTotalOccurrencesLineGraph = (domElement, height, width, labelSpacing, cases, recovered, deaths, dates) => {
-  // Reverse dates to have them in chronological order.
+  d3.select(domElement).select('svg').remove()
 
   // Calculate the number of new confirmed cases on a daily basis.
   const totalCases = _parseTotalDailyCases(cases, dates)

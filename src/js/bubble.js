@@ -43,6 +43,8 @@ L.BubbleLayer = (L.Layer ? L.Layer : L.Class).extend({
       fillOpacity: 0.5
     }
 
+    options.onBubbleClick = options.hasOwnProperty('onBubbleClick') ? options.onBubbleClick : _ => {}
+
     L.setOptions(this, options)
 
     //TODO: throw error if invalid.
@@ -61,7 +63,10 @@ L.BubbleLayer = (L.Layer ? L.Layer : L.Class).extend({
     return this
   },
 
-  // When Layer is added to the map, present each point as a bubble
+  /**
+   * A trigger that is fired when the bubble map is added
+   * @param map
+   */
   onAdd(map) {
 
     this._map = map
@@ -117,16 +122,21 @@ L.BubbleLayer = (L.Layer ? L.Layer : L.Class).extend({
     if (this.options.scale) {
       fill_scale = chroma.scale(this.options.scale)
     }
-
+    const onclick = this.options.onBubbleClick
     return new L.geoJson(this._geojson, {
+
+      onEachFeature: function (feature, layer) {
+        layer.myTag =
+          'bubblelayer'
+      },
 
       pointToLayer: function (feature, latlng) {
 
         // TODO Check if total is a valid amount
-        var total = feature.properties[property]
+        const total = feature.properties[property]
 
         // Calculate the area of the bubble based on the property total and the resulting radius
-        var area = scale(total)
+        const area = scale(total)
         style.radius = Math.sqrt(area / Math.PI)
 
         // If the option include a scale, use it
@@ -136,7 +146,7 @@ L.BubbleLayer = (L.Layer ? L.Layer : L.Class).extend({
         style.color = chroma(style.fillColor).darken().hex()
 
         // Create the circleMarker object
-        return L.circleMarker(latlng, style)
+        return L.circleMarker(latlng, style).on('click', onclick)
       }
     })
   },

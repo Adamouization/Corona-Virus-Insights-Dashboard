@@ -55,17 +55,22 @@
                     <h1 class="h3 mb-0 text-gray-800">Coronavirus Insights</h1>
 
                     <!-- Topbar Search -->
-                    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                   aria-label="Search" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
+                    <div class="pull-right">
+                        <form onsubmit="" class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light border-0 small" id="search-query" placeholder="Search for..."
+                                       aria-label="Search" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button" id="search-button">
+                                        <i class="fas fa-search fa-sm"></i>
+                                    </button>
+                                </div>
+                                <div class="invalid-feedback" id="validation-msg">
+                                    The city or state does not exist or the query returned too many states.
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Content Row -->
@@ -134,7 +139,7 @@
                             <div class="card-body">
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1   ">
                                             Infected Countries
                                         </div>
                                         <div class="row no-gutters align-items-center">
@@ -160,6 +165,21 @@
 
                 </div>
                 <!-- End of Row -->
+
+                <div class="row" id="filter-card">
+                    <div class="col-xl-12 col-lg-12">
+                        <div class="card shadow mb-4">
+                            <!-- Card Header -->
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">Filters</h6>
+                            </div>
+                            <!-- Card Body -->
+                            <div class="card-body" id="filter-container">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Content Row -->
                 <div class="row">

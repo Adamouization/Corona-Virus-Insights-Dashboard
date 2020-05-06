@@ -2,8 +2,15 @@ import {getDatesFromTimeSeriesObject} from './utils.js'
 import {populateDailyEvolutionLineGraph, populateTotalOccurrencesLineGraph} from './line-graph.js'
 import {buildLollipopChart} from './lollipop.js'
 import {bubbleLayer} from './bubble.js'
-import {createMap} from './map.js'
+import {createMap, removeMarkers} from './map.js'
 import {mapBubbleStyle} from './style.js'
+
+window.graphData = {}
+
+const margin = {top: 10, right: 30, bottom: 40, left: 100},
+  width = 460 - margin.left - margin.right,
+  height = 240 - margin.top - margin.bottom
+
 
 const mapboxAccessToken = 'pk.eyJ1IjoibWF0dGRyYWdvOTgiLCJhIjoiY2s4MWhia2l0MDUyZTNmb2Rqa2x1YjV0NiJ9.XmI1DncVRdyUOl_yhifSJQ'
 const map = createMap(mapboxAccessToken).setView([47, 2], 5)
@@ -57,7 +64,7 @@ const standardiseGeoJson = geoJson => ({
  * @param currentDate the current date
  * @returns {[{reading: string, value: bigint}, {reading: string, value: bigint}, {reading: string, value: bigint}]}
  */
-const getCaseDetails = (cases, deaths, recovered, currentDate) => [
+const getCaseDetails = (cases, recovered, deaths, currentDate) => [
   {
     reading: 'total',
     value: cases.map(country => Number(country[currentDate])).reduce((prev, next) => prev + next)
@@ -71,27 +78,84 @@ const getCaseDetails = (cases, deaths, recovered, currentDate) => [
     value: recovered.map(country => Number(country[currentDate])).reduce((prev, next) => prev + next)
   }]
 
+const applyCountryFilter = (name, cases, recovered, deaths) => {
+  const filter = reading => reading['Country/Region'] === name
+  const filteredCases = cases.filter(filter)
+  const filteredRecoveries = recovered.filter(filter)
+  const filteredDeaths = deaths.filter(filter)
+  populateDailyEvolutionLineGraph('#line-graph-daily-evolution', 210, 600, 8,
+    filteredCases, filteredRecoveries, filteredDeaths,
+    Object.keys(getDatesFromTimeSeriesObject(cases[0])))
+  populateTotalOccurrencesLineGraph('#line-graph-total', 300, 1600, 2,
+    filteredCases, filteredRecoveries, filteredDeaths,
+    Object.keys(getDatesFromTimeSeriesObject(cases[0])))
+  buildLollipopChart('case-breakdown', 215, 600, getCaseDetails(filteredCases, filteredRecoveries, filteredDeaths,
+    Object.keys(getDatesFromTimeSeriesObject(cases[0])).sort((a, b) => new Date(b) - new Date(a))[0]))
+}
+
+const createFilterBreadCrumb = (name, onclick, filterParent='filter-container') => {
+  const template = document.createElement('div')
+  template.innerHTML = `<button class="btn btn-secondary">
+                            <span class="txt">${name}</span>
+                            <span class="round"><i class="fas text-gray-300 fa-times"></i></span>
+                        </button>`
+  template.firstChild.childNodes[3].firstChild.addEventListener('click', onclick)
+  document.getElementById(filterParent).appendChild(template)
+}
+
+const onBubble = e => {
+  const { properties } = e.sourceTarget.feature
+  const {cases, recovered, deaths} = window.graphData
+  applyCountryFilter(properties['Name'], cases, recovered, deaths)
+  createFilterBreadCrumb(properties['Name'], e => {
+    console.log('test')
+    buildCharts().then(() => {})
+  })
+}
 /**
  * An function to build the charts
- * @returns {Promise<void>}
+ * @returns {Promise<object>}
  */
 const buildCharts = async () => {
   const latLongIso = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv')
   const cases = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv')
   const recovered = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv')
   const deaths = await d3.csv('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv')
-  const dates = Object.keys(getDatesFromTimeSeriesObject(cases[0]))
-  const currentDate = dates.sort((a, b) => new Date(b) - new Date(a))[0]
+  const currentDate = Object.keys(getDatesFromTimeSeriesObject(cases[0])).sort((a, b) => new Date(b) - new Date(a))[0]
   // await populateMap('#map', map, cases, currentDate)
   const geoJSON = standardiseGeoJson(getGeoJsonFromCases(cases, recovered, deaths, latLongIso, currentDate))
-  bubbleLayer(geoJSON, { property: 'cases', legend: true, tooltip: true, style: mapBubbleStyle()}).addTo(map)
-  buildLollipopChart('case-breakdown', 215, 600, getCaseDetails(cases, deaths, recovered, currentDate))
+  removeMarkers(map, 'bubblelayer')
+  bubbleLayer(geoJSON, { property: 'cases', onBubbleClick: onBubble, legend: true, tooltip: true, style: mapBubbleStyle()}).addTo(map)
+  buildLollipopChart('case-breakdown', 215, 600, getCaseDetails(cases, recovered, deaths, currentDate))
+  const dates = Object.keys(getDatesFromTimeSeriesObject(cases[0]))
   populateDailyEvolutionLineGraph('#line-graph-daily-evolution', 210, 600, 8, cases, recovered, deaths, dates)
   populateTotalOccurrencesLineGraph('#line-graph-total', 300, 1600, 2, cases, recovered, deaths, dates)
+  return {
+    latLongIso,
+    cases,
+    recovered,
+    deaths
+  }
 }
 
 // Build the charts
-buildCharts().then(() => {})
+buildCharts().then((data) => {
+  window.graphData = data
+  document.getElementById('search-button').addEventListener('click', e => {
+    const query = document.getElementById('search-query').value.toLowerCase()
+    const { latLongIso } = data
+    const countriesFiltered = latLongIso
+      .filter(country => country['Country_Region'].toLowerCase() === query
+        || country['Province_State'].toLowerCase() === query)
+    if (countriesFiltered.length === 0 || query === '') {
+      document.getElementById('search-query').classList.add('is-invalid')
+      document.getElementById('validation-msg').innerHTML = 'That country or state does not exist.'
+    } else {
+      document.getElementById('search-query').classList.remove('is-invalid')
+      map.panTo(new L.LatLng(countriesFiltered[0]['Lat'], countriesFiltered[0]['Long_']), {animate: true, duration: 0.75})
+    }
+  })
+})
 
 // Update on move
 map.on('moveend', () => {
