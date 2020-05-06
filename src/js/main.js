@@ -156,11 +156,9 @@ buildCharts().then((data) => {
     }
   })
 
-  // Update Dates card
-  const currentDate = getCurrentDate(data.cases)
-  document.getElementById('card-date').innerHTML = currentDate
-  // Update total confirmed cases card
-  document.getElementById('card-total-confirmed-cases').innerHTML = numberWithCommas(getCasesOnDay(data.cases, currentDate))
+  // Populate the 4 cards at the top with the latest data.
+  populateCards(data)
+
 })
 
 // Update on move
@@ -169,3 +167,19 @@ map.on('moveend', () => {
     .attr('cx', d => map.latLngToLayerPoint([d['Lat'], d['Long']]).x)
     .attr('cy', d => map.latLngToLayerPoint([d['Lat'], d['Long']]).y)
 })
+
+/**
+ * Populates the 4 cards at the top of the dashboard.
+ */
+function populateCards(data) {
+  const dates = Object.keys(getDatesFromTimeSeriesObject(data.cases[0]))
+  const currentDate = dates[dates.length - 1]
+  const previousDate = dates[dates.length - 2]
+
+  debugger;
+
+  // Update the cards
+  document.getElementById('card-date').innerHTML = currentDate
+  document.getElementById('card-total-confirmed-cases').innerHTML = numberWithCommas(getCasesOnDay(data.cases, currentDate))
+  document.getElementById('card-confirmed-cases-today').innerHTML = numberWithCommas(Math.abs(getCasesOnDay(data.cases, currentDate) - getCasesOnDay(data.cases, previousDate)))
+}
