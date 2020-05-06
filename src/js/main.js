@@ -37,7 +37,7 @@ const getGeoJsonFromCases = (cases, recoveries, deaths, isoPopulation, date) => 
         .filter(recovery => recovery['Country/Region'] === reading['Country/Region']), ['0', date], 0),
       deaths: _.get(deaths.filter(death => death['Province/State'] === reading['Province/State'])
         .filter(death => death['Country/Region'] === reading['Country/Region']), ['0', date], 0),
-      population: isoPopulation.filter(country => country['Province_State'] === reading['Province/State'])
+      Population: isoPopulation.filter(country => country['Province_State'] === reading['Province/State'])
         .filter(country => country['Country_Region'] === reading['Country/Region'])[0]['Population']
     },
   }))
@@ -54,7 +54,7 @@ const standardiseGeoJson = geoJson => ({
     ...feature,
     properties: {
       ...feature.properties,
-      'Infections per 1000': (feature.properties.cases / feature.properties.population * 1000).toPrecision(3) + "‰",
+      'Infections per 1000': (feature.properties.cases / feature.properties.Population * 1000).toPrecision(3) + "‰",
       'Mortality Rate': (feature.properties.deaths / feature.properties.cases * 100).toPrecision(3) + "%"
     }
   }))

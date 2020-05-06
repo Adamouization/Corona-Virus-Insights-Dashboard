@@ -5,6 +5,8 @@ https://github.com/OpenGov/Leaflet.bubble
 converted to es6 and adapted for our use case
  */
 
+import {numberWithCommas} from './utils.js'
+
 /**
  * An extended class to add bubbles on a leaflet map.
  */
@@ -221,7 +223,19 @@ L.BubbleLayer = (L.Layer ? L.Layer : L.Class).extend({
   showTooltip (layer) {
     layer.on('mouseover', (e) => {
       const props = e.layer.feature.properties
-      const tip = Object.keys(props).filter(key => props.hasOwnProperty(key)).map(key => `<strong>${key}</strong>: ${props[key]}</br>`).reduce((string, current) => string + current, '')
+
+      // Temporary way of hiding undesired properties from the tooltip. Todo: improve by directly changing the geojson.
+      delete props.cases
+      delete props.deaths
+      delete props.recovered
+      props.Population = numberWithCommas(props.Population)
+
+      // Build the tooltip.
+      const tip = Object
+        .keys(props)
+        .filter(key => props.hasOwnProperty(key))
+        .map(key => `<strong>${key}</strong>: ${props[key]}</br>`)
+        .reduce((string, current) => string + current, '')
       e.layer.bindPopup(tip)
       e.layer.openPopup()
     })
