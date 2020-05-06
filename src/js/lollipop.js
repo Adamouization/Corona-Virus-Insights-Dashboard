@@ -1,4 +1,5 @@
 import {colourScheme, margin} from "./style.js"
+import {numberWithCommas} from "./utils.js"
 
 /**
  *
@@ -28,6 +29,30 @@ const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'r
     .attr('y1', d => y(d[yKey]))
     .attr('y2', d => y(d[yKey]))
     .attr('stroke', 'grey')
+    .attr('stroke-width', 2)
+
+  // Labels
+  chart.selectAll(`text${name}lollipop`)
+    .data(data)
+    .enter()
+    .append('text')
+    .attr('x', (d, i) => {
+      if (i === 1) {
+        return x(d[xKey]) + 10
+      } else {
+        return x(d[xKey]) + 35
+      }
+    })
+    .attr('y', (d, i) => {
+      if (i === 0) {
+        return y(d[yKey]) + ((x(d[xKey]) * 0.06) / 4)
+      } else {
+        return y(d[yKey]) + ((x(d[xKey]) * 0.1) / 4)
+      }
+    })
+    .attr('fill', "black")
+    .text(d => numberWithCommas(d[xKey]))
+    .style('font-size', "12px")
 
   // Circles
   chart.selectAll(`circle${name}lollipop`)
@@ -36,7 +61,13 @@ const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'r
     .append('circle')
     .attr('cx', (d) => x(d[xKey]))
     .attr('cy', (d) => y(d[yKey]))
-    .attr('r', '4')
+    .attr('r', (d, i) => {
+      if (i === 0) {
+        return x(d[xKey]) * 0.07
+      } else {
+        return x(d[xKey]) * 0.15
+      }
+    })
     .style('fill', colourScheme.primary)
     .attr('stroke', 'black')
   chart.selectAll(`circle${name}lollipop`)
@@ -77,7 +108,7 @@ const _createSVGContainer = (height) => {
 const _getXAxis = (data, width) => {
   return d3.scaleLinear()
     .domain([0, d3.max(data, function (d) {
-      return d.value
+      return d.value + 700000
     })])
     .range([0, width - margin])
 }

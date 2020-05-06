@@ -1,4 +1,4 @@
-import {getCasesOnDay, getCurrentDate, getDates, getDatesFromTimeSeriesObject, numberWithCommas} from './utils.js'
+import {getCasesOnDay, getCurrentDate, getDates, numberWithCommas} from './utils.js'
 import {deleteLineChart, populateDailyEvolutionLineGraph, populateTotalOccurrencesLineGraph} from './line-graph.js'
 import {buildLollipopChart, deleteLollipopChart} from './lollipop.js'
 import {bubbleLayer} from './bubble.js'
@@ -97,7 +97,7 @@ const applyCountryFilter = (name, cases, recovered, deaths) => {
   const filteredDeaths = deaths.filter(filter)
 
   // Redraw charts.
-  const lollipopChart = buildLollipopChart(lollipopChartDivId, 212, document.getElementById(lollipopChartDivId).offsetWidth - 15, getCaseDetails(filteredCases, filteredRecoveries, filteredDeaths, getCurrentDate(cases)))
+  const lollipopChart = buildLollipopChart(lollipopChartDivId, 212, document.getElementById(lollipopChartDivId).offsetWidth - 35, getCaseDetails(filteredCases, filteredRecoveries, filteredDeaths, getCurrentDate(cases)))
   const svgLineChartDaily = populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 210, document.getElementById(lineChartDailyDivId).offsetWidth, 8, filteredCases, filteredRecoveries, filteredDeaths, getDates(cases))
   const svgLineChartTotal = populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, filteredCases, filteredRecoveries, filteredDeaths, getDates(cases))
 }
@@ -169,7 +169,7 @@ const buildCharts = async () => {
   }).addTo(map)
 
   // Build charts
-  const lollipopChart = buildLollipopChart(lollipopChartDivId, 212, document.getElementById(lollipopChartDivId).offsetWidth - 15, getCaseDetails(cases, recovered, deaths, currentDate))
+  const lollipopChart = buildLollipopChart(lollipopChartDivId, 212, document.getElementById(lollipopChartDivId).offsetWidth - 35, getCaseDetails(cases, recovered, deaths, currentDate))
   const svgLineChartDaily = populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 210, document.getElementById(lineChartDailyDivId).offsetWidth, 8, cases, recovered, deaths, getDates(cases))
   const svgLineChartTotal = populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, cases, recovered, deaths, getDates(cases))
 
@@ -224,7 +224,7 @@ buildCharts()
       const lineChartDailyDivId = "line-graph-daily-evolution"
       const lineChartTotalDivId = "line-graph-total"
       const svgLineChartDaily = populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 210, document.getElementById(lineChartDailyDivId).offsetWidth, 8, window.graphData.cases, window.graphData.recovered, window.graphData.deaths, getDates(window.graphData.cases))
-      const lollipopChart = buildLollipopChart(lollipopChartDivId, 212, document.getElementById(lollipopChartDivId).offsetWidth - 15, getCaseDetails(window.graphData.cases, window.graphData.recovered, window.graphData.deaths, getCurrentDate(window.graphData.cases)))
+      const lollipopChart = buildLollipopChart(lollipopChartDivId, 212, document.getElementById(lollipopChartDivId).offsetWidth - 35, getCaseDetails(window.graphData.cases, window.graphData.recovered, window.graphData.deaths, getCurrentDate(window.graphData.cases)))
       const svgLineChartTotal = populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, window.graphData.cases, window.graphData.recovered, window.graphData.deaths, getDates(window.graphData.cases))
 
       // Save the new SVG charts for future resizing
