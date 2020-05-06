@@ -1,6 +1,6 @@
 import {getCasesOnDay, getCurrentDate, getDatesFromTimeSeriesObject, numberWithCommas} from './utils.js'
-import {deleteLines, populateDailyEvolutionLineGraph, populateTotalOccurrencesLineGraph} from './line-graph.js'
-import {buildLollipopChart} from './lollipop.js'
+import {deleteLineChart, populateDailyEvolutionLineGraph, populateTotalOccurrencesLineGraph} from './line-graph.js'
+import {buildLollipopChart, deleteLollipopChart} from './lollipop.js'
 import {bubbleLayer} from './bubble.js'
 import {createMap, removeMarkers} from './map.js'
 import {mapBubbleStyle} from './style.js'
@@ -169,7 +169,7 @@ const buildCharts = async () => {
 
   // Lollipop chart
   const lollipopChartDivId = "case-breakdown"
-  buildLollipopChart(lollipopChartDivId, 212, document.getElementById(lollipopChartDivId).offsetWidth - 15, getCaseDetails(cases, recovered, deaths, currentDate))
+  const lollipopChart = buildLollipopChart(lollipopChartDivId, 212, document.getElementById(lollipopChartDivId).offsetWidth - 15, getCaseDetails(cases, recovered, deaths, currentDate))
 
   // Line charts
   const dates = Object.keys(getDatesFromTimeSeriesObject(cases[0]))
@@ -185,7 +185,8 @@ const buildCharts = async () => {
     deaths,
     dates,
     svgLineChartDaily,
-    svgLineChartTotal
+    svgLineChartTotal,
+    lollipopChart
   }
 }
 
@@ -220,17 +221,21 @@ buildCharts()
     // Update chart sizes on window resize.
     window.onresize = function (event) {
       // Erase existing lines
-      deleteLines(window.graphData.svgLineChartDaily)
-      deleteLines(window.graphData.svgLineChartTotal)
+      deleteLineChart(window.graphData.svgLineChartTotal)
+      deleteLollipopChart(window.graphData.lollipopChart)
+      deleteLineChart(window.graphData.svgLineChartDaily)
 
       // Redraw charts
+      const lollipopChartDivId = "case-breakdown"
       const lineChartDailyDivId = "line-graph-daily-evolution"
       const lineChartTotalDivId = "line-graph-total"
       const svgLineChartDaily = populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 210, document.getElementById(lineChartDailyDivId).offsetWidth, 8, window.graphData.cases, window.graphData.recovered, window.graphData.deaths, window.graphData.dates)
+      const lollipopChart = buildLollipopChart(lollipopChartDivId, 212, document.getElementById(lollipopChartDivId).offsetWidth - 15, getCaseDetails(window.graphData.cases, window.graphData.recovered, window.graphData.deaths, getCurrentDate(window.graphData.cases)))
       const svgLineChartTotal = populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, window.graphData.cases, window.graphData.recovered, window.graphData.deaths, window.graphData.dates)
 
       // Save the new SVG charts for future resizing
       window.graphData.svgLineChartDaily = svgLineChartDaily
+      window.graphData.lollipopChart = lollipopChart
       window.graphData.svgLineChartTotal = svgLineChartTotal
     }
   })

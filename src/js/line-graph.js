@@ -55,6 +55,11 @@ const populateDailyEvolutionLineGraph = (domElement, height, width, labelSpacing
 const populateTotalOccurrencesLineGraph = (domElement, height, width, labelSpacing, cases, recovered, deaths, dates) => {
   d3.select(domElement).select('svg').remove()
 
+  // Reduce number of labels on small screens.
+  if (width <= 800) {
+    labelSpacing = 8
+  }
+
   // Calculate the number of new confirmed cases on a daily basis.
   const totalCases = _parseTotalDailyCases(cases, dates)
   const totalRecoveries = _parseTotalDailyCases(recovered, dates)
@@ -281,15 +286,15 @@ const _drawLegend = (lineGraphInstance, colours, legendLabels) => {
 }
 
 /**
- * Delete lines in a line chart.s
+ * Delete paths in a line chart.
  * @param svgElement
  */
-const deleteLines = (svgElement) => {
+const deleteLineChart = (svgElement) => {
   svgElement.selectAll("path").remove()
 }
 
 export {
   populateDailyEvolutionLineGraph,
   populateTotalOccurrencesLineGraph,
-  deleteLines
+  deleteLineChart
 }
