@@ -208,7 +208,7 @@ L.BubbleLayer = (L.Layer ? L.Layer : L.Class).extend({
       return div
     }
     if (this._map['legend']){
-      this._map['legend'].removeFrom(this._map)
+      this._map['legend'].remove()
     }
     legend.addTo(this._map)
     // Add this one (only) for now, as the Population layer is on by default
