@@ -68,8 +68,16 @@ const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'r
         return x(d[xKey]) * 0.15
       }
     })
-    .style('fill', colourScheme.primary)
-    .attr('stroke', 'black')
+    .style('fill', (d, i) => {
+      if (i === 0) {
+        return colourScheme.warning
+      } else if (i === 1) {
+        return colourScheme.danger
+      } else {
+        return colourScheme.success
+      }
+    })
+    .attr('stroke', colourScheme.secondary)
   chart.selectAll(`circle${name}lollipop`)
     .transition()
     .duration(2000)
