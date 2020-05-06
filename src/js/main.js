@@ -128,7 +128,7 @@ const onBubble = e => {
   applyCountryFilter(properties['Name'], cases, recovered, deaths)
   createFilterBreadCrumb(properties['Name'], e => {
     console.log('test')
-    buildCharts().then(() => {
+    buildCharts(window.graphData).then(() => {
     })
   })
 }
