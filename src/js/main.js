@@ -181,6 +181,8 @@ function populateCards(data) {
   document.getElementById('card-date').innerHTML = currentDate
   document.getElementById('card-total-confirmed-cases').innerHTML = numberWithCommas(getCasesOnDay(data.cases, currentDate))
   document.getElementById('card-confirmed-cases-today').innerHTML = numberWithCommas(Math.abs(getCasesOnDay(data.cases, currentDate) - getCasesOnDay(data.cases, previousDate)))
+  document.getElementById('card-total-confirmed-cases-header').innerHTML = `Total Confirmed Cases up to ${currentDate}`
+  document.getElementById('confirmed-cases-on-header').innerHTML = `New Confirmed Cases on ${currentDate}`
 }
 
 /**

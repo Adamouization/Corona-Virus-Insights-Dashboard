@@ -80,7 +80,12 @@
                                 </div>
                             </div>
                         </form>
+                        <a class="btn" data-toggle="modal" data-target="#date-modal">
+                            <i class="fas fa-calendar-day fa-2x text-gray-300" data-toggle="tooltip"
+                               data-placement="bottom" title="Open Date Picker"></i>
+                        </a>
                     </div>
+
                 </div>
 
                 <!-- Content Row -->
@@ -107,11 +112,11 @@
 
                     <!-- Total confirmed cases -->
                     <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-danger shadow h-100 py-2">
+                        <div class="card border-left-warning shadow h-100 py-2">
                             <div class="card-body">
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1" id="card-total-confirmed-cases-header">
                                             Total confirmed cases
                                         </div>
                                         <div id="card-total-confirmed-cases"
@@ -131,7 +136,7 @@
                             <div class="card-body">
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1" id="confirmed-cases-on-header">
                                             Confirmed cases today
                                         </div>
                                         <div id="card-confirmed-cases-today"
@@ -160,10 +165,7 @@
                                         </div>
                                     </div>
                                     <div class="col-auto">
-                                        <a class="btn" data-toggle="modal" data-target="#date-modal">
-                                            <i class="fas fa-calendar-day fa-2x text-gray-300" data-toggle="tooltip"
-                                               data-placement="bottom" title="Open Date Picker"></i>
-                                        </a>
+                                        <i class="fas fa-filter fa-2x text-gray-300"></i>
                                     </div>
                                 </div>
                             </div>

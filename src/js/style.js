@@ -25,7 +25,7 @@ const colourScheme = {
 }
 
 const margin = {
-  lineChart: 65,
+  lineChart: 70,
   lollipopChart: 70,
 }
 
