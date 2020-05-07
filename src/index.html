@@ -10,8 +10,7 @@
     <meta name="author" content="Copyright Adam Jaamour & Matthew Drago © 2020">
     <meta name="keywords" content="coronavirus, virus, covid-19, covid, wuhan, cases, john hopkins">
     <meta name="description"
-          content="This website aims to provide insights into the 2019 Novel Coronavirus COVID-19 by visualising the
-          Johns Hopkins University Centre for Systems Science and Engineering through the d3.js library.">
+          content="This website aims to provide insights into the 2019 Novel Coronavirus COVID-19 by visualising the Johns Hopkins University Centre for Systems Science and Engineering through the d3.js library.">
 
     <!-- Favicon -->
     <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
@@ -34,8 +33,9 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
           integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
           crossorigin=""/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"
-          integrity="sha256-siyOpF/pBWUPgIcQi17TLBkjvNgNQArcmwJB8YvkAgg=" crossorigin="anonymous" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"
+          integrity="sha256-siyOpF/pBWUPgIcQi17TLBkjvNgNQArcmwJB8YvkAgg=" crossorigin="anonymous"/>
 </head>
 
 <body class="container-fluid">
@@ -56,7 +56,8 @@
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
                     <div>
                         <h1 class="h3 mb-0 text-gray-800" style="float:left;">Coronavirus Insights</h1>
-                        <button type="button" class="btn btn btn-outline-secondary" data-toggle="modal" data-target="#myModal" style="margin-left: 10px">
+                        <button type="button" class="btn btn btn-outline-secondary" data-toggle="modal"
+                                data-target="#myModal" style="margin-left: 10px">
                             <i class="fas fa-info-circle fa-sm"></i>
                         </button>
                     </div>
@@ -154,12 +155,14 @@
                                             Filters
                                         </div>
                                         <div class="row no-gutters align-items-center" id="filter-container">
-                                            <p class="h5 mb-0 font-weight-bold text-gray-800" id="no-filter-msg">No filters applied</p>
+                                            <p class="h5 mb-0 font-weight-bold text-gray-800" id="no-filter-msg">No
+                                                filters applied</p>
                                         </div>
                                     </div>
                                     <div class="col-auto">
-                                        <a class="btn" data-toggle="modal" data-target="#date-modal" >
-                                        <i class="fas fa-calendar-day fa-2x text-gray-300" data-toggle="tooltip" data-placement="bottom" title="Open Date Picker"></i>
+                                        <a class="btn" data-toggle="modal" data-target="#date-modal">
+                                            <i class="fas fa-calendar-day fa-2x text-gray-300" data-toggle="tooltip"
+                                               data-placement="bottom" title="Open Date Picker"></i>
                                         </a>
                                     </div>
                                 </div>
@@ -194,7 +197,8 @@
                         <div class="card shadow mb-4">
                             <!-- Card Header -->
                             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary" id="daily-evolution-header">Daily Evolution</h6>
+                                <h6 class="m-0 font-weight-bold text-primary" id="daily-evolution-header">Daily
+                                    Evolution</h6>
                             </div>
                             <!-- Card Body -->
                             <div class="card-body">
@@ -205,7 +209,8 @@
                         <!-- Lollipop Chart -->
                         <div class="card shadow mb-4">
                             <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary" id="global-breakdown">Global Breakdown</h6>
+                                <h6 class="m-0 font-weight-bold text-primary" id="global-breakdown">Global
+                                    Breakdown</h6>
                             </div>
                             <div class="card-body">
                                 <div id="case-breakdown"></div>
@@ -223,7 +228,8 @@
                         <!-- Line chart showing all cases -->
                         <div class="card shadow mb-4">
                             <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary" id="total-occurrences">Total Occurrences</h6>
+                                <h6 class="m-0 font-weight-bold text-primary" id="total-occurrences">Total
+                                    Occurrences</h6>
                             </div>
                             <div class="card-body">
                                 <div id="line-graph-total"></div>
@@ -258,7 +264,8 @@
 </div>
 <!-- End of Page Wrapper -->
 <!--Date picker-->
-<div class="modal fade" id="date-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="date-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -289,8 +296,17 @@
             <div class="modal-body">
                 <p>Welcome to this interactive web-based dashboard for tracking the spread of COVID-19 across the world.
                     The data, provided by John Hopkins CSSE, is updated on a daily basis.</p>
-                <p>Feel free to filter the visualisations by country through the search bar or through the map (by
-                    clicking on a specific country).</p>
+                <p>Feel free to interact with the visualisations by using the provided filters:
+                <ul>
+                    <li>
+                        Filter by <b>country</b> through the search bar or the map (by clicking on a specific country).
+                    </li>
+                    <li>
+                        Filter up to a desired <b>date</b> (by clicking the small calendar icon in the top-right card).
+                    </li>
+                </ul>
+                <p>Active filters will be displayed in the <i>Filters</i> card in the top right-hand corner. Active
+                    filters can be removed by clicking on the small cross.</p>
                 <p>Data source: <a href="https://systems.jhu.edu/research/public-health/ncov/">JHU CSSE</a>.</p>
             </div>
             <div class="modal-footer">
