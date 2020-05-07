@@ -17,6 +17,19 @@ const getDatesFromTimeSeriesObject = object => Object.keys(object)
   .reduce((newObj, key) => Object.assign(newObj, {[key]: object[key]}), {})
 
 /**
+ * Formats a date string into us style dates
+ * @param dateStr the date
+ * @returns {string} the formatted date
+ */
+const formatDate = dateStr => {
+  const date = new Date(dateStr)
+  const day = date.getDate()
+  const month = date.getMonth()
+  const year = String(date.getFullYear()).substr(-2)
+  return `${month}/${day}/${year}`
+}
+
+/**
  *
  * @param country
  * @param cases
@@ -77,5 +90,6 @@ export {
   buildDatesArr,
   getCurrentDate,
   numberWithCommas,
-  getDates
+  getDates,
+  formatDate
 }

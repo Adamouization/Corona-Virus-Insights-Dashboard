@@ -1,9 +1,12 @@
-import {getCasesOnDay, getCurrentDate, getDates, numberWithCommas, getDatesFromTimeSeriesObject} from './utils.js'
+import {getCasesOnDay, getCurrentDate, getDates, numberWithCommas, getDatesFromTimeSeriesObject, formatDate } from './utils.js'
 import {deleteLineChart, populateDailyEvolutionLineGraph, populateTotalOccurrencesLineGraph} from './line-graph.js'
 import {buildLollipopChart, deleteLollipopChart} from './lollipop.js'
 import {bubbleLayer} from './bubble.js'
 import {createMap, removeMarkers} from './map.js'
 import {mapBubbleStyle} from './style.js'
+
+
+$('#datepicker').datepicker();
 
 window.graphData = {}
 window.filters = {
@@ -109,12 +112,10 @@ const getCaseDetails = (cases, recovered, deaths, currentDate) => [
 /**
  *
  * @param name
- * @param cases
- * @param recovered
- * @param deaths
+ * @param data
  */
-const applyCountryFilter = (name, cases, recovered, deaths) => {
-  // Filtered data.
+const applyCountryFilter = (name, data) => {
+  const { cases, recovered, deaths } = data
   const filter = reading => reading['Country/Region'] === name
   const filteredCases = cases.filter(filter)
   const filteredRecoveries = recovered.filter(filter)
@@ -122,10 +123,13 @@ const applyCountryFilter = (name, cases, recovered, deaths) => {
   Object.keys(headers).forEach((id) => {
     document.getElementById(id).innerText = changeHeader(name, id)
   })
+  const currentMaxDate = window.filters.date || getCurrentDate(cases)
+  const dateRange = getDates(cases).filter(date => new Date(date) <= new Date(currentMaxDate))
+    .sort((a, b) => new Date(a) - new Date(b))
   // Redraw charts.
   buildLollipopChart(lollipopChartDivId, 212, document.getElementById(lollipopChartDivId).offsetWidth - 35, getCaseDetails(filteredCases, filteredRecoveries, filteredDeaths, getCurrentDate(cases)))
-  populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 210, document.getElementById(lineChartDailyDivId).offsetWidth, 8, filteredCases, filteredRecoveries, filteredDeaths, getDates(cases))
-  populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, filteredCases, filteredRecoveries, filteredDeaths, getDates(cases))
+  populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 210, document.getElementById(lineChartDailyDivId).offsetWidth, 8, filteredCases, filteredRecoveries, filteredDeaths, dateRange)
+  populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, filteredCases, filteredRecoveries, filteredDeaths, dateRange)
 }
 
 /**
@@ -151,8 +155,7 @@ const createFilterBreadCrumb = (name, onclick, crumb_class='country-filter-crumb
  */
 const onBubble = e => {
   const {properties} = e.sourceTarget.feature
-  const {cases, recovered, deaths} = window.graphData
-  applyCountryFilter(properties['Name'], cases, recovered, deaths)
+  applyCountryFilter(properties['Name'], window.graphData)
   document.querySelectorAll('button.country-filter-crumb').forEach(crumb => crumb.remove())
   filterProxy.country = properties['Name']
   createFilterBreadCrumb(properties['Name'], e => {
@@ -186,7 +189,7 @@ function populateCards(data) {
  */
 const buildCharts = async (data, date = undefined) => {
   const {latLongIso, cases, recovered, deaths} = data
-  const currentDate = date || getCurrentDate(cases)
+  const currentDate = date || window.filters.date || getCurrentDate(cases)
   const geoJSON = standardiseGeoJson(getGeoJsonFromCases(cases, recovered, deaths, latLongIso, currentDate))
   removeMarkers(map, 'bubblelayer')
   bubbleLayer(geoJSON, {
@@ -197,10 +200,12 @@ const buildCharts = async (data, date = undefined) => {
     style: mapBubbleStyle()
   }).addTo(map)
 
+  const dateRange = getDates(cases).filter(date => new Date(date) <= new Date(currentDate))
+    .sort((a, b) => new Date(a) - new Date(b))
   // Build charts
   const lollipopChart = buildLollipopChart(lollipopChartDivId, 260, document.getElementById(lollipopChartDivId).offsetWidth - 35, getCaseDetails(cases, recovered, deaths, currentDate))
-  const svgLineChartDaily = populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 276, document.getElementById(lineChartDailyDivId).offsetWidth, 8, cases, recovered, deaths, getDates(cases))
-  const svgLineChartTotal = populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, cases, recovered, deaths, getDates(cases))
+  const svgLineChartDaily = populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 276, document.getElementById(lineChartDailyDivId).offsetWidth, 8, cases, recovered, deaths, dateRange)
+  const svgLineChartTotal = populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, cases, recovered, deaths, dateRange)
 
   return {
     latLongIso,
@@ -237,6 +242,8 @@ const loadData = async () => {
 
 loadData().then(data => {
   window.graphData = data
+  const { currentDate } = data
+  $('#datepicker').datepicker('update', currentDate)
   buildCharts(window.graphData).then((data) => {
     window.graphData = data
 
@@ -283,6 +290,17 @@ loadData().then(data => {
       window.graphData.svgLineChartTotal = svgLineChartTotal
     }
   })
+})
+
+$('#datepicker').on('changeDate', e => {
+  const date = new Date($('#datepicker').datepicker('getFormattedDate'))
+  filterProxy.date = formatDate(date)
+  document.querySelectorAll('.date-filter-crumb').forEach(crumb => crumb.remove())
+  createFilterBreadCrumb(`Show up to ${formatDate(date)}`, () => {}, 'date-filter-crumb')
+  buildCharts(window.graphData, formatDate(date))
+  $('#date-modal').modal('toggle')
+  if (window.filters.country !== undefined) applyCountryFilter(window.filters.country,
+    window.graphData)
 })
 
 // Update on move
