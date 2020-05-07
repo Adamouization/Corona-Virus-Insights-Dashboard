@@ -141,7 +141,7 @@ const applyCountryFilter = (name, data) => {
  */
 const createFilterBreadCrumb = (name, onclick, crumb_class='country-filter-crumb', filterParent = 'filter-container') => {
   const template = document.createElement('div')
-  template.innerHTML = `<button class="btn btn-secondary ${crumb_class}">
+  template.innerHTML = `<button class="btn btn-outline-secondary ${crumb_class}" >
                             <span class="txt">${name}</span>
                             <span class="round"><i class="fas text-gray-300 fa-times"></i></span>
                         </button>`
@@ -296,11 +296,19 @@ $('#datepicker').on('changeDate', e => {
   const date = new Date($('#datepicker').datepicker('getFormattedDate'))
   filterProxy.date = formatDate(date)
   document.querySelectorAll('.date-filter-crumb').forEach(crumb => crumb.remove())
-  createFilterBreadCrumb(`Show up to ${formatDate(date)}`, () => {}, 'date-filter-crumb')
-  buildCharts(window.graphData, formatDate(date))
-  $('#date-modal').modal('toggle')
-  if (window.filters.country !== undefined) applyCountryFilter(window.filters.country,
-    window.graphData)
+  createFilterBreadCrumb(`Show up to ${formatDate(date)}`, (e) => {
+    filterProxy.date = undefined
+    e.currentTarget.parentNode.parentNode.remove()
+    buildCharts(window.graphData).then(_ => {
+      if (window.filters.country !== undefined) applyCountryFilter(window.filters.country,
+        window.graphData)
+    })
+  }, 'date-filter-crumb')
+  buildCharts(window.graphData, formatDate(date)).then(_ => {
+    if (window.filters.country !== undefined) applyCountryFilter(window.filters.country,
+      window.graphData)
+    $('#date-modal').modal('toggle')
+  })
 })
 
 // Update on move

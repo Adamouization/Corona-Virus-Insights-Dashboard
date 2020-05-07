@@ -56,7 +56,7 @@
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
                     <div>
                         <h1 class="h3 mb-0 text-gray-800" style="float:left;">Coronavirus Insights</h1>
-                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#myModal" style="margin-left: 10px">
+                        <button type="button" class="btn btn btn-outline-secondary" data-toggle="modal" data-target="#myModal" style="margin-left: 10px">
                             <i class="fas fa-info-circle fa-sm"></i>
                         </button>
                     </div>
@@ -158,8 +158,8 @@
                                         </div>
                                     </div>
                                     <div class="col-auto">
-                                        <a class="btn" data-toggle="modal" data-target="#date-modal">
-                                        <i class="fas fa-globe fa-2x text-gray-300"></i>
+                                        <a class="btn" data-toggle="modal" data-target="#date-modal" >
+                                        <i class="fas fa-calendar-day fa-2x text-gray-300" data-toggle="tooltip" data-placement="bottom" title="Open Date Picker"></i>
                                         </a>
                                     </div>
                                 </div>
@@ -268,7 +268,11 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div id="datepicker" data-date="12/03/2012"></div>
+                <div class="row">
+                    <div class="col-auto mx-auto">
+                        <div id="datepicker" data-date="12/03/2012"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
