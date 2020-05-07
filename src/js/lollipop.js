@@ -1,6 +1,12 @@
 import {colourScheme, margin} from "./style.js"
 import {numberWithCommas} from "./utils.js"
 
+const circleScale = data => {
+  return d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.value)])
+    .range([Math.PI * 2, Math.PI * 5])
+}
+
 /**
  *
  * @param name
@@ -22,7 +28,7 @@ const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'r
   const x = _getXAxis(data, width)
   const y = _getYAxis(height, data.map(item => item[yKey]))
   _drawAxes(chart, height, x, y)
-
+  const circleSize = circleScale(data)
   // Lines
   chart.selectAll(`line${name}lollipop`)
     .data(data)
@@ -67,13 +73,7 @@ const buildLollipopChart = (name, height, width, data, xKey = 'value', yKey = 'r
     .append('circle')
     .attr('cx', (d) => x(d[xKey]))
     .attr('cy', (d) => y(d[yKey]))
-    .attr('r', (d, i) => {
-      if (i === 0) {
-        return x(d[xKey]) * 0.06
-      } else {
-        return x(d[xKey]) * 0.14
-      }
-    })
+    .attr('r', (d, i) => circleSize(d[xKey]))
     .style('fill', (d, i) => {
       if (i === 0) {
         return colourScheme.warning

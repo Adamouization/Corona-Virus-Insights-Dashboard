@@ -34,6 +34,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
           integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
           crossorigin=""/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"
+          integrity="sha256-siyOpF/pBWUPgIcQi17TLBkjvNgNQArcmwJB8YvkAgg=" crossorigin="anonymous" />
 </head>
 
 <body class="container-fluid">
@@ -54,7 +56,7 @@
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
                     <div>
                         <h1 class="h3 mb-0 text-gray-800" style="float:left;">Coronavirus Insights</h1>
-                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#myModal" style="margin-left: 10px">
+                        <button type="button" class="btn btn btn-outline-secondary" data-toggle="modal" data-target="#myModal" style="margin-left: 10px">
                             <i class="fas fa-info-circle fa-sm"></i>
                         </button>
                     </div>
@@ -141,20 +143,8 @@
                             </div>
                         </div>
                     </div>
-<!--                    <div class="row d-none" id="filter-card" >-->
-<!--                        <div class="col-xl-12 col-lg-12">-->
-<!--                            <div class="card shadow mb-4">-->
-<!--                                &lt;!&ndash; Card Header &ndash;&gt;-->
-<!--                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">-->
-<!--                                    <h6 class="m-0 font-weight-bold text-primary">Filters</h6>-->
-<!--                                </div>-->
-<!--                                &lt;!&ndash; Card Body &ndash;&gt;-->
-<!--                                <div class="card-body" id="filter-container"></div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
 
-                    <!-- Infected countries -->
+                    <!-- Filter Card -->
                     <div class="col-xl-3 col-md-6 mb-4" id="filter-card">
                         <div class="card border-left-info shadow h-100 py-2">
                             <div class="card-body">
@@ -164,11 +154,13 @@
                                             Filters
                                         </div>
                                         <div class="row no-gutters align-items-center" id="filter-container">
-                                            <p id="no-filter-msg">No filters applied</p>
+                                            <p class="h5 mb-0 font-weight-bold text-gray-800" id="no-filter-msg">No filters applied</p>
                                         </div>
                                     </div>
                                     <div class="col-auto">
-                                        <i class="fas fa-globe fa-2x text-gray-300"></i>
+                                        <a class="btn" data-toggle="modal" data-target="#date-modal" >
+                                        <i class="fas fa-calendar-day fa-2x text-gray-300" data-toggle="tooltip" data-placement="bottom" title="Open Date Picker"></i>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -265,7 +257,26 @@
 
 </div>
 <!-- End of Page Wrapper -->
-
+<!--Date picker-->
+<div class="modal fade" id="date-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Pick a Date</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-auto mx-auto">
+                        <div id="datepicker" data-date="12/03/2012"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Modal -->
 <div id="myModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
@@ -304,7 +315,8 @@
 <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.1.0/chroma.min.js"
         integrity="sha256-gX8uuyxN8stSMHWO9arnnKyenTOALaVAcVB3b6P87e4=" crossorigin="anonymous"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"
+        integrity="sha256-bqVeqGdJ7h/lYPq6xrPv/YGzMEb6dNxlfiTUHSgRCp8=" crossorigin="anonymous"></script>
 <!-- Custom JS module import -->
 <script type="module" src="js/main.js"></script>
 </body>
