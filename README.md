@@ -6,7 +6,7 @@ You can visit the website here: [corona-virus-insights.herokuapp.com](https://co
 
 ## Screenshots
 
-![alt text](path)
+![screenshot](https://raw.githubusercontent.com/Adamouization/CS5044-Practical-3/master/screenshot.png?token=AEI7XLERLG2E7YMVZWVAGS26XWGMC)
 
 ## Usage
 
