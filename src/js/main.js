@@ -181,6 +181,8 @@ function populateCards(data) {
   document.getElementById('card-date').innerHTML = currentDate
   document.getElementById('card-total-confirmed-cases').innerHTML = numberWithCommas(getCasesOnDay(data.cases, currentDate))
   document.getElementById('card-confirmed-cases-today').innerHTML = numberWithCommas(Math.abs(getCasesOnDay(data.cases, currentDate) - getCasesOnDay(data.cases, previousDate)))
+  document.getElementById('card-total-confirmed-cases-header').innerHTML = `Total Confirmed Cases up to ${currentDate}`
+  document.getElementById('confirmed-cases-on-header').innerHTML = `New Confirmed Cases on ${currentDate}`
 }
 
 /**
@@ -240,6 +242,24 @@ const loadData = async () => {
   }
 }
 
+const search = e => {
+  const query = document.getElementById('search-query').value.toLowerCase()
+  const {latLongIso} = window.graphData
+  const countriesFiltered = latLongIso
+    .filter(country => country['Country_Region'].toLowerCase() === query
+      || country['Province_State'].toLowerCase() === query)
+  if (countriesFiltered.length === 0 || query === '') {
+    document.getElementById('search-query').classList.add('is-invalid')
+    document.getElementById('validation-msg').innerHTML = 'That country or state does not exist.'
+  } else {
+    document.getElementById('search-query').classList.remove('is-invalid')
+    map.panTo(new L.LatLng(countriesFiltered[0]['Lat'], countriesFiltered[0]['Long_']), {
+      animate: true,
+      duration: 0.75
+    })
+  }
+}
+
 loadData().then(data => {
   window.graphData = data
   const { currentDate } = data
@@ -251,22 +271,10 @@ loadData().then(data => {
     populateCards(data)
 
     // Search bar
-    document.getElementById('search-button').addEventListener('click', e => {
-      const query = document.getElementById('search-query').value.toLowerCase()
-      const {latLongIso} = data
-      const countriesFiltered = latLongIso
-        .filter(country => country['Country_Region'].toLowerCase() === query
-          || country['Province_State'].toLowerCase() === query)
-      if (countriesFiltered.length === 0 || query === '') {
-        document.getElementById('search-query').classList.add('is-invalid')
-        document.getElementById('validation-msg').innerHTML = 'That country or state does not exist.'
-      } else {
-        document.getElementById('search-query').classList.remove('is-invalid')
-        map.panTo(new L.LatLng(countriesFiltered[0]['Lat'], countriesFiltered[0]['Long_']), {
-          animate: true,
-          duration: 0.75
-        })
-      }
+    document.getElementById('search-button').addEventListener('click', search)
+    document.getElementById('search-form').addEventListener('submit', e => {
+      e.preventDefault()
+      search(e)
     })
 
     // Update chart sizes on window resize.
