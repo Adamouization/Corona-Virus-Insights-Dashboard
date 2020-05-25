@@ -1,12 +1,11 @@
-import {getCasesOnDay, getCurrentDate, getDates, numberWithCommas, getDatesFromTimeSeriesObject, formatDate } from './utils.js'
-import {deleteLineChart, populateDailyEvolutionLineGraph, populateTotalOccurrencesLineGraph} from './line-graph.js'
-import {buildLollipopChart, deleteLollipopChart} from './lollipop.js'
-import {bubbleLayer} from './bubble.js'
-import {createMap, removeMarkers} from './map.js'
-import {mapBubbleStyle} from './style.js'
+import { getCasesOnDay, getCurrentDate, getDates, numberWithCommas, getDatesFromTimeSeriesObject, formatDate } from './utils.js'
+import { deleteLineChart, populateDailyEvolutionLineGraph, populateTotalOccurrencesLineGraph } from './line-graph.js'
+import { buildLollipopChart, deleteLollipopChart } from './lollipop.js'
+import { bubbleLayer } from './bubble.js'
+import { createMap, removeMarkers } from './map.js'
+import { mapBubbleStyle } from './style.js'
 
-
-$('#datepicker').datepicker();
+$('#datepicker').datepicker()
 
 window.graphData = {}
 window.filters = {
@@ -32,10 +31,9 @@ const filterProxy = new Proxy(window.filters, {
   }
 })
 
-
-const lineChartDailyDivId = "line-graph-daily-evolution"
-const lineChartTotalDivId = "line-graph-total"
-const lollipopChartDivId = "case-breakdown"
+const lineChartDailyDivId = 'line-graph-daily-evolution'
+const lineChartTotalDivId = 'line-graph-total'
+const lollipopChartDivId = 'case-breakdown'
 
 const mapboxAccessToken = 'pk.eyJ1IjoibWF0dGRyYWdvOTgiLCJhIjoiY2s4MWhia2l0MDUyZTNmb2Rqa2x1YjV0NiJ9.XmI1DncVRdyUOl_yhifSJQ'
 const map = createMap(mapboxAccessToken).setView([47, 2], 3)
@@ -50,23 +48,23 @@ const map = createMap(mapboxAccessToken).setView([47, 2], 3)
  * @returns {{features: Uint8Array | BigInt64Array | {geometry: {coordinates: [number, number, number], type: string}, type: string, properties: {cases, name}}[] | Float64Array | Int8Array | Float32Array | Int32Array | Uint32Array | Uint8ClampedArray | BigUint64Array | Int16Array | Uint16Array, type: string}}
  */
 const getGeoJsonFromCases = (cases, recoveries, deaths, isoPopulation, date) => ({
-  type: "FeatureCollection",
+  type: 'FeatureCollection',
   features: cases.map(reading => ({
-    type: "Feature",
+    type: 'Feature',
     geometry: {
-      type: "Point",
-      coordinates: [Number(reading['Long']), Number(reading['Lat']), 0]
+      type: 'Point',
+      coordinates: [Number(reading.Long), Number(reading.Lat), 0]
     },
     properties: {
-      'Name': reading['Province/State'] || reading['Country/Region'],
+      Name: reading['Province/State'] || reading['Country/Region'],
       cases: Number(reading[date]),
       recovered: _.get(recoveries.filter(recovery => recovery['Province/State'] === reading['Province/State'])
         .filter(recovery => recovery['Country/Region'] === reading['Country/Region']), ['0', date], 0),
       deaths: _.get(deaths.filter(death => death['Province/State'] === reading['Province/State'])
         .filter(death => death['Country/Region'] === reading['Country/Region']), ['0', date], 0),
-      Population: isoPopulation.filter(country => country['Province_State'] === reading['Province/State'])
-        .filter(country => country['Country_Region'] === reading['Country/Region'])[0]['Population']
-    },
+      Population: _.get(isoPopulation.filter(country => country.Province_State === reading['Province/State'])
+        .filter(country => country.Country_Region === reading['Country/Region']), ['0', 'Population'], 0)
+    }
   }))
 })
 
@@ -76,13 +74,13 @@ const getGeoJsonFromCases = (cases, recoveries, deaths, isoPopulation, date) => 
  * @returns {{features: {properties: {"Mortality Rate": number, "Infections per 1000": number}}[], type: string}}
  */
 const standardiseGeoJson = geoJson => ({
-  type: "FeatureCollection",
+  type: 'FeatureCollection',
   features: geoJson.features.map(feature => ({
     ...feature,
     properties: {
       ...feature.properties,
-      'Infections per 1000': (feature.properties.cases / feature.properties.Population * 1000).toPrecision(3) + "‰",
-      'Mortality Rate': (feature.properties.deaths / feature.properties.cases * 100).toPrecision(3) + "%"
+      'Infections per 1000': (feature.properties.cases / feature.properties.Population * 1000).toPrecision(3) + '‰',
+      'Mortality Rate': (feature.properties.deaths / feature.properties.cases * 100).toPrecision(3) + '%'
     }
   }))
 })
@@ -102,7 +100,7 @@ const getCaseDetails = (cases, recovered, deaths, currentDate) => [
   },
   {
     reading: 'deaths',
-    value: deaths.map(country => Number(country[currentDate])).reduce((prev, next) => prev + next),
+    value: deaths.map(country => Number(country[currentDate])).reduce((prev, next) => prev + next)
   },
   {
     reading: 'recovered',
@@ -139,7 +137,7 @@ const applyCountryFilter = (name, data) => {
  * @param crumb_class the crumb class
  * @param filterParent the filter parent document
  */
-const createFilterBreadCrumb = (name, onclick, crumb_class='country-filter-crumb', filterParent = 'filter-container') => {
+const createFilterBreadCrumb = (name, onclick, crumb_class = 'country-filter-crumb', filterParent = 'filter-container') => {
   const template = document.createElement('div')
   template.innerHTML = `<button class="btn btn-outline-secondary ${crumb_class}" >
                             <span class="txt">${name}</span>
@@ -154,11 +152,11 @@ const createFilterBreadCrumb = (name, onclick, crumb_class='country-filter-crumb
  * @param e
  */
 const onBubble = e => {
-  const {properties} = e.sourceTarget.feature
-  applyCountryFilter(properties['Name'], window.graphData)
+  const { properties } = e.sourceTarget.feature
+  applyCountryFilter(properties.Name, window.graphData)
   document.querySelectorAll('button.country-filter-crumb').forEach(crumb => crumb.remove())
-  filterProxy.country = properties['Name']
-  createFilterBreadCrumb(properties['Name'], e => {
+  filterProxy.country = properties.Name
+  createFilterBreadCrumb(properties.Name, e => {
     filterProxy.country = undefined
     e.currentTarget.parentNode.parentNode.remove()
     Object.entries(headers).forEach(([id, value]) => {
@@ -173,7 +171,7 @@ const onBubble = e => {
  * Populates the 4 cards at the top of the dashboard.
  * @param data
  */
-function populateCards(data) {
+function populateCards (data) {
   const currentDate = getDates(data.cases)[getDates(data.cases).length - 1]
   const previousDate = getDates(data.cases)[getDates(data.cases).length - 2]
 
@@ -190,7 +188,7 @@ function populateCards(data) {
  * @returns {Promise<object>}
  */
 const buildCharts = async (data, date = undefined) => {
-  const {latLongIso, cases, recovered, deaths} = data
+  const { latLongIso, cases, recovered, deaths } = data
   const currentDate = date || window.filters.date || getCurrentDate(cases)
   const geoJSON = standardiseGeoJson(getGeoJsonFromCases(cases, recovered, deaths, latLongIso, currentDate))
   removeMarkers(map, 'bubblelayer')
@@ -217,7 +215,7 @@ const buildCharts = async (data, date = undefined) => {
     svgLineChartDaily,
     svgLineChartTotal,
     lollipopChart,
-    currentDate,
+    currentDate
   }
 }
 
@@ -238,22 +236,22 @@ const loadData = async () => {
     cases: dataSources[1],
     recovered: dataSources[2],
     deaths: dataSources[3],
-    currentDate,
+    currentDate
   }
 }
 
 const search = e => {
   const query = document.getElementById('search-query').value.toLowerCase()
-  const {latLongIso} = window.graphData
+  const { latLongIso } = window.graphData
   const countriesFiltered = latLongIso
-    .filter(country => country['Country_Region'].toLowerCase() === query
-      || country['Province_State'].toLowerCase() === query)
+    .filter(country => country.Country_Region.toLowerCase() === query ||
+      country.Province_State.toLowerCase() === query)
   if (countriesFiltered.length === 0 || query === '') {
     document.getElementById('search-query').classList.add('is-invalid')
     document.getElementById('validation-msg').innerHTML = 'That country or state does not exist.'
   } else {
     document.getElementById('search-query').classList.remove('is-invalid')
-    map.panTo(new L.LatLng(countriesFiltered[0]['Lat'], countriesFiltered[0]['Long_']), {
+    map.panTo(new L.LatLng(countriesFiltered[0].Lat, countriesFiltered[0].Long_), {
       animate: true,
       duration: 0.75
     })
@@ -285,9 +283,9 @@ loadData().then(data => {
       deleteLineChart(window.graphData.svgLineChartDaily)
 
       // Redraw charts
-      const lollipopChartDivId = "case-breakdown"
-      const lineChartDailyDivId = "line-graph-daily-evolution"
-      const lineChartTotalDivId = "line-graph-total"
+      const lollipopChartDivId = 'case-breakdown'
+      const lineChartDailyDivId = 'line-graph-daily-evolution'
+      const lineChartTotalDivId = 'line-graph-total'
       const svgLineChartDaily = populateDailyEvolutionLineGraph('#' + lineChartDailyDivId, 207, document.getElementById(lineChartDailyDivId).offsetWidth, 8, window.graphData.cases, window.graphData.recovered, window.graphData.deaths, getDates(window.graphData.cases))
       const lollipopChart = buildLollipopChart(lollipopChartDivId, 210, document.getElementById(lollipopChartDivId).offsetWidth - 35, getCaseDetails(window.graphData.cases, window.graphData.recovered, window.graphData.deaths, getCurrentDate(window.graphData.cases)))
       const svgLineChartTotal = populateTotalOccurrencesLineGraph('#' + lineChartTotalDivId, 300, document.getElementById(lineChartTotalDivId).offsetWidth, 2, window.graphData.cases, window.graphData.recovered, window.graphData.deaths, getDates(window.graphData.cases))
@@ -308,13 +306,17 @@ $('#datepicker').on('changeDate', e => {
     filterProxy.date = undefined
     e.currentTarget.parentNode.parentNode.remove()
     buildCharts(window.graphData).then(_ => {
-      if (window.filters.country !== undefined) applyCountryFilter(window.filters.country,
-        window.graphData)
+      if (window.filters.country !== undefined) {
+        applyCountryFilter(window.filters.country,
+          window.graphData)
+      }
     })
   }, 'date-filter-crumb')
   buildCharts(window.graphData, formatDate(date)).then(_ => {
-    if (window.filters.country !== undefined) applyCountryFilter(window.filters.country,
-      window.graphData)
+    if (window.filters.country !== undefined) {
+      applyCountryFilter(window.filters.country,
+        window.graphData)
+    }
     $('#date-modal').modal('toggle')
   })
 })
@@ -322,6 +324,6 @@ $('#datepicker').on('changeDate', e => {
 // Update on move
 map.on('moveend', () => {
   d3.selectAll('.mapCircle')
-    .attr('cx', d => map.latLngToLayerPoint([d['Lat'], d['Long']]).x)
-    .attr('cy', d => map.latLngToLayerPoint([d['Lat'], d['Long']]).y)
+    .attr('cx', d => map.latLngToLayerPoint([d.Lat, d.Long]).x)
+    .attr('cy', d => map.latLngToLayerPoint([d.Lat, d.Long]).y)
 })
