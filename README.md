@@ -1,7 +1,7 @@
 # Coronavirus Insights Dashboard 
-[![HitCount](http://hits.dwyl.com/Adamouization/Corona-Virus-Insights-Dashboard.svg)](http://hits.dwyl.com/Adamouization/Corona-Virus-Insights-Dashboard) ![Heroku](http://heroku-badge.herokuapp.com/?app=angularjs-crypto&style=flat&svg=1) [![GitHub license](https://img.shields.io/github/license/Adamouization/Corona-Virus-Insights-Dashboard)](https://github.com/Adamouization/Corona-Virus-Insights-Dashboard/blob/master/LICENSE)
+[![HitCount](http://hits.dwyl.com/Adamouization/Corona-Virus-Insights-Dashboard.svg)](http://hits.dwyl.com/Adamouization/Corona-Virus-Insights-Dashboard) [![GitHub license](https://img.shields.io/github/license/Adamouization/Corona-Virus-Insights-Dashboard)](https://github.com/Adamouization/Corona-Virus-Insights-Dashboard/blob/master/LICENSE)
 
-This website aims to provide insights into the 2019 Novel Coronavirus COVID-19 by visualising the Johns Hopkins University Centre for Systems Science and Engineering through the d3.js library.
+This website aims to provide insights into the 2019 Novel Coronavirus COVID-19 by visualising the Johns Hopkins University Centre for Systems Science and Engineering through the D3.js library. It was developed in the context of a practical for our Information Visualisation module, requiring us to visualise any dataset in D3.JS.
 
 You can visit the website here: [corona-virus-insights.herokuapp.com](https://corona-virus-insights.herokuapp.com/)
 
