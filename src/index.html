@@ -6,11 +6,9 @@
 
     <!-- Metadata -->
     <title>Coronavirus Insights</title>
-    <meta name="description" content="The HTML5 Herald">
-    <meta name="author" content="Copyright Adam Jaamour & Matthew Drago © 2020">
+    <meta name="description" content="A dashboard to visualise John Hopkins CSSE's daily Covid-19 Data">
+    <meta name="author" content="Adam Jaamour">
     <meta name="keywords" content="coronavirus, virus, covid-19, covid, wuhan, cases, john hopkins">
-    <meta name="description"
-          content="This website aims to provide insights into the 2019 Novel Coronavirus COVID-19 by visualising the Johns Hopkins University Centre for Systems Science and Engineering through the d3.js library.">
 
     <!-- Favicon -->
     <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
@@ -252,7 +250,7 @@
         <footer class="sticky-footer bg-white">
             <div class="container my-auto">
                 <div class="copyright text-center my-auto">
-                    <span>Built with D3.js, Node.js & <i class="fa fa-fw fa-heart" style="color: red"></i> by <a href="https://x.com/Adamouization" target="_blank">Adam Jaamour</a> & <a href="https://www.linkedin.com/in/mdrago98/" target="_blank">Matthew Drago</a> &copy; 2020</span>
+                    <span>Built with D3.js, Node.js & <i class="fa fa-fw fa-heart" style="color: red"></i> by <a href="https://x.com/Adamouization" target="_blank">Adam Jaamour</a> & <a href="https://www.linkedin.com/in/mdrago98/" target="_blank">Matthew Drago</a> &copy; 2020</span> | <a href="#" data-toggle="modal" data-target="#privacy-modal" class="text-primary">Privacy Policy</a>
                     <br>
                     <span><i>Data source: JHU CSSE (Johns Hopkins University Center for Systems Science and Engineering)</i></span>
                     <br>
@@ -332,6 +330,50 @@
     </div>
 </div>
 <!-- end Modal -->
+
+<!-- Privacy Policy Modal -->
+<div class="modal fade" id="privacy-modal" tabindex="-1" role="dialog" aria-labelledby="privacyModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="privacyModalLabel">Privacy Policy</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h1>Privacy Policy for Coronavirus Insights</h1>
+                <p><strong>Effective Date:</strong> December 16, 2024</p>
+                <p>Thank you for using Coronavirus Insights, a dashboard that visualizes John Hopkins CSSE's daily Covid-19 data. Your privacy is important to us. Below is our privacy policy explaining how we handle your information.</p>
+                
+                <h5>1. Information We Collect</h5>
+                <p>We do not collect any personal data from our users.</p>
+
+                <h5>2. Cookies and Non-Personal Data</h5>
+                <p>We use web cookies to collect non-personal data for the purpose of improving our Google search ranking.</p>
+
+                <h5>3. Data Sharing</h5>
+                <p>We do not share any collected data with third parties.</p>
+
+                <h5>4. Children's Privacy</h5>
+                <p>We do not knowingly collect any data from children under the age of 13.</p>
+
+                <h5>5. Updates to This Privacy Policy</h5>
+                <p>We may update this privacy policy from time to time. If you have contacted us via email, we will notify you of any changes by email.</p>
+
+                <h5>6. Contact Us</h5>
+                <p>If you have any questions about this privacy policy, please contact us at:</p>
+                <p><strong>Email:</strong> <a href="mailto:hello@jaamour.com">hello@jaamour.com</a></p>
+
+                <p>Thank you for trusting Coronavirus Insights.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End of Privacy Policy Modal -->
 
 <!-- Third-party JS libraries import -->
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"
