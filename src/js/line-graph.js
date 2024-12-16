@@ -225,10 +225,10 @@ const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis, labelSpacing
     .attr("dy", "-0.15em")
     .attr("transform", "rotate(-65)")
 
-  // Add the Y axis to the svg.
+  // Add the Y axis to the svg with adjusted transform for better visibility.
   lineGraphInstance.append("g")
     .attr("class", "y axis")
-    .attr("transform", "translate(" + margin.lineChart + ",0)")
+    .attr("transform", "translate(" + (margin.lineChart + 10) + ",0)") // Adjusted for better visibility
     .style('font-size', "12px")
     .call(yAxis)
     .append("text")
