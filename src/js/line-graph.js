@@ -208,7 +208,7 @@ const _createSVGContainer = (domElement, height) => {
  * @private
  */
 const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis, labelSpacing) => {
-  // Add the X axis to the svg. Only add a label every 8 days. Rotate labels to fit axis.
+  // Add the X axis to the svg. Only add a label every 16 days. Rotate labels to fit axis.
   lineGraphInstance.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(" + margin.lineChart + "," + height + ")")
@@ -216,7 +216,7 @@ const _drawAxes = (lineGraphInstance, height, xAxis, xScale, yAxis, labelSpacing
       .tickFormat(d3.timeFormat("%m/%d/%y"))
       .tickValues(xScale.domain()
         .filter(function (d, i) {
-          return !(i % labelSpacing)
+          return !(i % (labelSpacing * 6))
         })))
     .selectAll("text")
     .style("text-anchor", "end")

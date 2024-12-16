@@ -150,7 +150,7 @@ const _drawAxes = (chart, height, xAxisFunction, yAxisFunction) => {
     .attr('transform', 'translate(0, ' + (height - margin.lollipopChart) + ')')
     .call(d3.axisBottom(xAxisFunction))
     .selectAll('text')
-    .attr('transform', 'translate(-10,10)rotate(-65)')
+    .attr('transform', 'translate(0,10)rotate(-45)')
     .style('text-anchor', 'end')
     .style('font-size', "12px")
   chart.append('g')
